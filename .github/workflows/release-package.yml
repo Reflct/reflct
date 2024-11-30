@@ -1,0 +1,35 @@
+name: Publish Packages
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Triggers when a new tag is pushed
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history and tags
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org/"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build packages
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+        run: npx lerna run build
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx lerna publish --yes

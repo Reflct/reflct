@@ -1,0 +1,60 @@
+{
+  "name": "@reflct/react",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reflct/reflct.git",
+    "directory": "packages/react"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && rollup -c --bundleConfigAsCjs",
+    "dev": "npm run clean && rollup -c --bundleConfigAsCjs -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm publish --access public"
+  },
+  "authors": [
+    "In Ha Ryu <inha.ryu.97@gmail.com>"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@mkkellogg/gaussian-splats-3d": "0.4.5",
+    "@react-three/drei": "^9.92.7",
+    "@react-three/fiber": "^8.15.12",
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/react": "^18.3.8",
+    "postcss": "^8.4.47",
+    "react": "^18.3.1",
+    "rollup": "^4.22.4",
+    "rollup-plugin-dts": "^6.1.1",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "sass": "^1.79.2",
+    "typescript": "^5.6.2"
+  },
+  "peerDependencies": {
+    "@mkkellogg/gaussian-splats-3d": "0.4.5",
+    "@react-three/drei": "^9.92.7",
+    "@react-three/fiber": "^8.15.12",
+    "gsap": "^3.12.5",
+    "react": "^18.3.1",
+    "three": "^0.168.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "gsap": "^3.12.5"
+  }
+}

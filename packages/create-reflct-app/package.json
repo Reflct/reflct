@@ -1,0 +1,52 @@
+{
+  "name": "@reflct/create-reflct-app",
+  "version": "0.0.0",
+  "description": "Create Reflect Integrated App",
+  "private": true,
+  "bin": {
+    "create-reflct-app": "./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reflct/reflct.git",
+    "directory": "packages/create-reflct-app"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "ncc build ./src/index.ts -w -o ./dist/ -t",
+    "build": "ncc build ./src/index.ts -o ./dist/ --minify --no-cache --no-source-map-register -t",
+    "publish": "npm publish --access public"
+  },
+  "authors": [
+    "In Ha Ryu <inha.ryu.97@gmail.com>"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/prompts": "^2.4.9",
+    "@types/validate-npm-package-name": "^4.0.2",
+    "@vercel/ncc": "^0.38.2",
+    "commander": "^12.1.0",
+    "conf": "^13.0.1",
+    "execa": "^9.4.0",
+    "fast-glob": "^3.3.2",
+    "prompts": "^2.4.2",
+    "semver": "^7.6.3",
+    "update-check": "^1.5.4",
+    "validate-npm-package-name": "^6.0.0",
+    "zod": "^3.23.8"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "dependencies": {
+    "@reflct/next": "^0.0.0",
+    "cross-spawn": "^7.0.6"
+  }
+}

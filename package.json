@@ -1,0 +1,27 @@
+{
+  "name": "reflct",
+  "version": "1.0.0",
+  "private": true,
+  "authors": [
+    "In Ha Ryu <inha.ryu.97@gmail.com>"
+  ],
+  "workspaces": [
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reflct/reflct.git"
+  },
+  "devDependencies": {
+    "lerna": "^8.1.9"
+  },
+  "scripts": {
+    "version": "lerna version",
+    "build": "lerna run build",
+    "publish": "lerna publish from-git --yes"
+  },
+  "dependencies": {
+    "@mkkellogg/gaussian-splats-3d": "0.4.5",
+    "concurrently": "^9.0.1"
+  }
+}
