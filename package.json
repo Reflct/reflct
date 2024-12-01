@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "lerna run build",
-    "publish": "lerna publish",
+    "publish": "lerna publish from-git --yes",
     "prepare": "husky"
   },
   "dependencies": {

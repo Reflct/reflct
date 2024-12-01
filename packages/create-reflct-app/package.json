@@ -35,7 +35,7 @@
     "node": ">=18.18.0"
   },
   "dependencies": {
-    "@reflct/next": "*",
+    "@reflct/next": "^0.0.0-alpha.1",
     "cross-spawn": "^7.0.3"
   }
 }
