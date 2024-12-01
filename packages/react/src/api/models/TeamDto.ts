@@ -1,6 +1,5 @@
-import { Role } from '@prisma/client';
-import { IsoDate, UUID } from './Common';
-import { z } from 'zod';
+import { z } from "zod";
+import { IsoDate, UUID } from "./Common";
 
 export type TeamDto = {
   id: UUID;
@@ -23,7 +22,7 @@ export type TeamDto = {
     id: string;
     name: string;
     email: string;
-    role: Role;
+    role: "ADMIN" | "MEMBER";
   }[];
 };
 
