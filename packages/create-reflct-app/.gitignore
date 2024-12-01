@@ -1,5 +1,7 @@
 # dependencies
-/node_modules
+node_modules
+.next
+certificates
 
 # testing
 /coverage
@@ -24,10 +26,7 @@ yarn-error.log*
 # prefer yarn than npm
 package-lock.json
 
-report.*.json
-
 # .vscode Debugging
 .vscode/*-debug-profile
-.vercel
 
 /dist

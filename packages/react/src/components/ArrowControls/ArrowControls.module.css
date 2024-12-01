@@ -1,0 +1,31 @@
+.reflct-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.reflct-controls.inactive {
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.reflct-controls > .button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  color: #000000;
+  background-color: #ffffff;
+  border-radius: 9999px;
+  transition: background-color 0.1s ease-in-out;
+}
+
+.reflct-controls > .button:hover {
+  background-color: #ebebeb;
+  color: #000000;
+}

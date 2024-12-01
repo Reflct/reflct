@@ -1,0 +1,24 @@
+{
+  "name": "reflct",
+  "version": "1.0.0",
+  "private": true,
+  "authors": [
+    "In Ha Ryu <inha.ryu.97@gmail.com>"
+  ],
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@mkkellogg/gaussian-splats-3d": "0.4.5",
+    "husky": "^9.1.7",
+    "lerna": "^8.1.9"
+  },
+  "scripts": {
+    "build": "lerna run build",
+    "publish": "lerna publish",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
