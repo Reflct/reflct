@@ -19,7 +19,7 @@ jobs:
           scope: "@reflct"
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Build packages
         run: yarn build
