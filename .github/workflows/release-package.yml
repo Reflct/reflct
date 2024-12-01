@@ -25,6 +25,6 @@ jobs:
         run: yarn build
 
       - name: Publish to npm
-        run: npx lerna publish from-git --yes
+        run: yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
