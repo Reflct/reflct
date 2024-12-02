@@ -21,6 +21,11 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
           cache: "npm"
 
+      - name: Verify npm authentication
+        run: npm whoami
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies
         run: npm install
 
@@ -32,4 +37,4 @@ jobs:
       - name: Publish packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx lerna publish --yes
+        run: npx lerna publish from-git --yes
