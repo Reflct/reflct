@@ -16,12 +16,13 @@ export default [
     input: "src/index.ts",
     output: [
       {
-        dir: "dist/esm",
+        dir: "dist",
         format: "esm",
         sourcemap: true,
         name: "reflct-next",
       },
     ],
+    external: ["@reflct/react", "next"],
     plugins: [
       peerDepsExternal(),
       resolve(),
@@ -40,7 +41,7 @@ export default [
     ],
   }),
   defineConfig({
-    input: "dist/esm/types/index.d.ts",
+    input: "dist/types/index.d.ts",
     output: {
       file: "dist/index.d.ts",
       format: "esm",

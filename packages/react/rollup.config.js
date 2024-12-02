@@ -27,6 +27,14 @@ export default [
         sourcemap: true,
       },
     ],
+    external: [
+      "@mkkellogg/gaussian-splats-3d",
+      "@react-three/drei",
+      "@react-three/fiber",
+      "gsap",
+      "react",
+      "three",
+    ],
     plugins: [
       peerDepsExternal(),
       resolve(),

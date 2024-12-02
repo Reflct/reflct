@@ -38,9 +38,7 @@ import React from "react";
 import { Viewer } from "@reflct/react";
 
 const App = () => {
-  return (
-    <Viewer id={"your-scene-id"} apikey={"your-apikey"} state={viewNumber} />
-  );
+  return <Viewer id={"your-scene-id"} apikey={"your-apikey"} />;
 };
 
 export default App;
