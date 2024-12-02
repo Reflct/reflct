@@ -17,10 +17,15 @@ export default [
     input: "src/index.ts",
     output: [
       {
-        dir: "dist/esm",
+        file: "dist/index.cjs.js",
+        format: "cjs",
+        sourcemap: true,
+        exports: "auto",
+      },
+      {
+        file: "dist/index.esm.js",
         format: "esm",
         sourcemap: true,
-        name: "reflct-next",
       },
     ],
     external: ["@reflct/react", "next"],

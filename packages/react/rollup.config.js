@@ -17,13 +17,13 @@ export default [
     input: "src/index.ts",
     output: [
       {
-        file: packageJson.main,
+        file: "dist/index.cjs.js",
         format: "cjs",
         sourcemap: true,
-        name: "reflct-react",
+        exports: "auto",
       },
       {
-        file: packageJson.module,
+        file: "dist/index.esm.js",
         format: "esm",
         sourcemap: true,
       },
@@ -63,7 +63,7 @@ export default [
         ],
         plugins: ["@babel/plugin-transform-runtime"],
       }),
-      terser(),
+      // terser(),
     ],
   }),
   defineConfig({
