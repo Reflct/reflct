@@ -1,6 +1,6 @@
 {
   "name": "@reflct/create-reflct-app",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Create Reflect Integrated App",
   "private": true,
   "bin": {
@@ -46,7 +46,7 @@
     "node": ">=18.18.0"
   },
   "dependencies": {
-    "@reflct/next": "^0.0.1-alpha.1",
+    "@reflct/next": "^0.0.1-alpha.2",
     "cross-spawn": "^7.0.6"
   }
 }
