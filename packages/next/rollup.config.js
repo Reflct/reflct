@@ -7,6 +7,7 @@ import { dts } from "rollup-plugin-dts";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import postcss from "rollup-plugin-postcss";
 import banner from "rollup-plugin-banner2";
+import babel from "@rollup/plugin-babel";
 import "dotenv/config";
 
 const packageJson = require("./package.json");
@@ -25,7 +26,9 @@ export default [
     external: ["@reflct/react", "next"],
     plugins: [
       peerDepsExternal(),
-      resolve(),
+      resolve({
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      }),
       commonjs(),
       postcss({
         modules: true,
@@ -35,6 +38,17 @@ export default [
       }),
       typescript({
         tsconfig: "./tsconfig.json",
+      }),
+      babel({
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        babelHelpers: "runtime",
+        exclude: /node_modules/,
+        presets: [
+          "@babel/preset-env",
+          "@babel/preset-react",
+          "@babel/preset-typescript",
+        ],
+        plugins: ["@babel/plugin-transform-runtime"],
       }),
       terser(),
       banner(() => `"use client"\n`),

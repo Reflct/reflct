@@ -9,6 +9,10 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/reflct/reflct.git",
@@ -52,5 +56,6 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5"
-  }
+  },
+  "gitHead": "70185d19ad658c244a3c0e7c28842a2da46996c0"
 }
