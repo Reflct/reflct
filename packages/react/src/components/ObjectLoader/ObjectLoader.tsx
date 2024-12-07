@@ -1,5 +1,5 @@
 import React from "react";
-import { MantelItem } from "../../api/models";
+import type { MantelItem } from "@reflct/api";
 import { useCanvasContext } from "../../context";
 import GS3dItem from "../items/GS3dItem";
 import PerspectiveCameraItem from "../Camera/PerspectiveCameraItem";

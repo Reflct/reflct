@@ -1,0 +1,38 @@
+{
+  "name": "@reflct/api",
+  "version": "0.0.1-alpha.4",
+  "description": "",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reflct/reflct.git",
+    "directory": "packages/api"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && node esbuild.mjs && tsc --emitDeclarationOnly --outDir dist"
+  },
+  "authors": [
+    "In Ha Ryu <inha.ryu.97@gmail.com>"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "esbuild": "0.24.0"
+  }
+}

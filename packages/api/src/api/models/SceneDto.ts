@@ -79,17 +79,18 @@ export type OrthographicCameraData = z.infer<
 export const mantelItemSchema = z.union([gs3dDataSchema, splatDataSchema]);
 export type MantelItem = z.infer<typeof mantelItemSchema>;
 
+export const sceneMetadataSchema = z.record(
+  z.string(),
+  z.object({ value: z.string(), updatedAt: isoDateSchema })
+);
+export type SceneMetadata = z.infer<typeof sceneMetadataSchema>;
+
 export const transitionSchema = z.object({
   id: z.string().uuid(),
   type: z.enum(["point"]),
   title: z.string(),
   description: z.string().optional(),
-  metadata: z
-    .record(
-      z.string(),
-      z.object({ value: z.string(), updatedAt: isoDateSchema })
-    )
-    .optional(),
+  metadata: sceneMetadataSchema.optional(),
   duration: z.number(),
   easing: z.string(),
   item: perspectiveCameraDataSchema,
@@ -100,12 +101,7 @@ export const transitionGroupSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
   description: z.string().optional(),
-  metadata: z
-    .record(
-      z.string(),
-      z.object({ value: z.string(), updatedAt: isoDateSchema })
-    )
-    .optional(),
+  metadata: sceneMetadataSchema.optional(),
   transitions: z.array(transitionSchema),
 });
 
@@ -119,24 +115,13 @@ export const sceneDataSchema = z.object({
 
 export type SceneDataDto = z.infer<typeof sceneDataSchema>;
 
-export const sceneMetadataSchema = z.record(
-  z.string(),
-  z.object({ value: z.string(), updatedAt: isoDateSchema })
-);
-export type SceneMetadata = z.infer<typeof sceneMetadataSchema>;
-
 export const sceneSchema = z.object({
   id: z.string().uuid(),
   teamId: z.string().uuid(),
   name: z.string(),
   description: z.string(),
   version: z.string(),
-  metadata: z
-    .record(
-      z.string(),
-      z.object({ value: z.string(), updatedAt: isoDateSchema })
-    )
-    .optional(),
+  metadata: sceneMetadataSchema.optional(),
   tags: z.array(z.string()),
   data: sceneDataSchema,
   createdAt: isoDateSchema,

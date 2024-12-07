@@ -7,6 +7,14 @@ set -e
 root_dir=$(pwd)
 dist_dir=$root_dir/dist
 
+# TODO: move this to root dir
+# TODO: copy all files in root dir to tmp dir then run npm pack with expected dependencies path update.
+# Pack the API package
+echo "Packing API package..."
+cd $root_dir/../api
+npm run build
+npm pack
+
 # Pack the React package
 echo "Packing React package..."
 cd $root_dir
@@ -18,6 +26,7 @@ tmp_dir=$root_dir/tmp
 rm -rf $tmp_dir
 mkdir -p $tmp_dir
 mv reflct-react-*.tgz $tmp_dir/reflct-react.tgz
+mv $root_dir/../api/reflct-api-*.tgz $tmp_dir/reflct-api.tgz
 
 # Create Next.js app
 echo "Creating Next.js app..."

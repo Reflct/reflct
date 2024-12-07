@@ -1,6 +1,6 @@
 # @reflct/react
 
-A React library for rendering 3D scenes and objects using Three.js and Gaussian Splats.
+A React library for integrating Reflct 3D scenes into your React apps.
 
 ## Installation
 
@@ -16,37 +16,28 @@ or if you're using yarn:
 yarn add @reflct/react
 ```
 
-## Dependencies
+## Getting Started
 
-This package has the following peer dependencies:
-
-- react
-- three
-- gsap
-- @react-three/drei
-- @react-three/fiber
-- @mkkellogg/gaussian-splats-3d
-
-Make sure to install these in your project if they're not already present.
-
-## Usage
-
-Here's a basic example of how to use the Canvas component:
+Here's a basic example of how to use the Viewer component:
 
 ```jsx
 import React from "react";
 import { Viewer } from "@reflct/react";
 
-const App = () => {
+const Page = () => {
   return <Viewer id={"your-scene-id"} apikey={"your-apikey"} />;
 };
 
-export default App;
+export default Page;
 ```
 
-## License
+## Documentation
 
-This project is licensed under the ISC License.
+TBC.
+
+## Licence
+
+This project is MIT licensed.
 
 ## Authors
 

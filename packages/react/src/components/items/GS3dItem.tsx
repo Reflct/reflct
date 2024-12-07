@@ -4,7 +4,7 @@ import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { GS3dData } from "../../api/models";
+import type { GS3dData } from "@reflct/api";
 import { useCanvasContext } from "../../context";
 import { mapMetadataToRecord } from "../../utils/helper";
 

@@ -3,7 +3,7 @@ import { useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { PerspectiveCameraData } from "../../api/models";
+import type { PerspectiveCameraData } from "@reflct/api";
 import { useCanvasContext } from "../../context";
 import { mapMetadataToRecord } from "../../utils/helper";
 

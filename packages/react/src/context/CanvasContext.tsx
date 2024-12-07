@@ -6,8 +6,12 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { client } from "../api/client";
-import { PerspectiveCameraData, SceneDataDto, Transition } from "../api/models";
+import { client } from "@reflct/api";
+import type {
+  PerspectiveCameraData,
+  SceneDataDto,
+  Transition,
+} from "@reflct/api";
 import { ViewMetadata } from "../types/common";
 
 type CanvasContextBaseType = {
