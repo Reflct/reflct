@@ -2,14 +2,13 @@
   "name": "@reflct/react",
   "version": "0.0.1-alpha.3",
   "description": "",
-  "main": "./dist/index.cjs.js",
-  "module": "./dist/index.esm.js",
-  "types": "./dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js"
     }
   },
   "files": [
@@ -26,9 +25,9 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && rollup -c --bundleConfigAsCjs",
-    "dev": "npm run clean && rollup -c --bundleConfigAsCjs -w",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run clean && rollup -c",
+    "dev": "npm run clean && rollup -c -w",
+    "test": "jest",
     "publish": "npm publish --access public"
   },
   "authors": [
@@ -36,6 +35,8 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@react-three/drei": "^9.92.7",
+    "@react-three/fiber": "^8.15.12",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.7",
@@ -43,29 +44,27 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/react": "^18.3.8",
     "dotenv": "^16.4.5",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
     "postcss": "^8.4.47",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "rollup": "^4.22.4",
     "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.79.2",
+    "three": "^0.168.0",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
-    "@mkkellogg/gaussian-splats-3d": "0.4.5",
-    "@react-three/drei": "^9.92.7",
-    "@react-three/fiber": "^8.15.12",
-    "gsap": "^3.12.5",
-    "react": "^18.3.1",
-    "three": "^0.168.0"
+    "react": "^18.3.1"
   },
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "0.4.5",
-    "@react-three/drei": "^9.92.7",
-    "@react-three/fiber": "^8.15.12",
     "gsap": "^3.12.5",
-    "react": "^18.3.1",
-    "three": "^0.168.0"
-  },
-  "gitHead": "38bd719014ebd35338f02cde0e4745b27e5729a7"
+    "three": "^0.168.0",
+    "@react-three/drei": "^9.92.7",
+    "@react-three/fiber": "^8.15.12"
+  }
 }

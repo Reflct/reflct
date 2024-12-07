@@ -31,3 +31,4 @@ report.*.json
 .vercel
 
 /dist
+/tmp

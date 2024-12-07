@@ -15,7 +15,9 @@ const ArrowControls: React.FC<Props> = ({ icons }) => {
 
   return (
     <div
-      className={`${styles["reflct-controls"]} ${automode ? styles["inactive"] : ""}`}
+      className={`${styles["reflct-controls"]} ${
+        automode ? styles["inactive"] : ""
+      }`}
     >
       <button className={styles["button"]} onClick={() => setState(state - 1)}>
         {icons?.left ? (

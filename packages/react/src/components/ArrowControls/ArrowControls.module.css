@@ -12,6 +12,7 @@
 .reflct-controls.inactive {
   opacity: 0.28;
   pointer-events: none;
+  cursor: default;
 }
 
 .reflct-controls > .button {
@@ -23,6 +24,8 @@
   background-color: #ffffff;
   border-radius: 9999px;
   transition: background-color 0.1s ease-in-out;
+  border: 0px;
+  cursor: pointer;
 }
 
 .reflct-controls > .button:hover {
