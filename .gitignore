@@ -14,6 +14,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# prefer npm
+yarn.lock
+
 # local env files
 .env
 .env.local
