@@ -16,7 +16,7 @@
     "react": "^18",
     "react-dom": "^18",
     "next": "14.2.14",
-    "@reflct/react": "^0.0.1-alpha.3"
+    "@reflct/react": "^0.0.1-alpha.4"
   },
   "devDependencies": {
     "typescript": "^5",
