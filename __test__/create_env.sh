@@ -65,7 +65,7 @@ cat $tmp_dir/.env | sed 's/SCENE_ID/NEXT_PUBLIC_SCENE_ID/g' | sed 's/REFLCT_API_
 # # Create React app
 # echo "Creating React app..."
 (cd $tmp_dir; npm create -y vite@latest tmp/vite-test -- --template react-ts)
-(cd $tmp_dir/vite-test; npm install ../reflct-react.tgz)
+(cd $env_dir/vite-test; npm install ../reflct-react.tgz)
 
 # Update App.tsx
 cat > $tmp_dir/vite-test/src/App.tsx << 'EOL'

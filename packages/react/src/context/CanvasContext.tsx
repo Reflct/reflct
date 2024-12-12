@@ -75,6 +75,7 @@ type CanvasContextType = CanvasContextBaseType & {
   items: SceneDataDto["items"];
   transitionGroups: SceneDataDto["transitionGroups"];
   transitions: Transition[];
+  backgroundColor: string | null;
   state: number;
   setState: React.Dispatch<React.SetStateAction<number>>;
   dom: HTMLElement | null;
@@ -91,6 +92,7 @@ type CanvasContextType = CanvasContextBaseType & {
     items?: SceneDataDto["items"];
     transitionGroups?: SceneDataDto["transitionGroups"];
     transitions?: Transition[];
+    backgroundColor?: string | null;
   }>;
 };
 
@@ -110,6 +112,7 @@ export const CanvasContext = createContext<CanvasContextType>({
   items: [],
   transitionGroups: [],
   transitions: [],
+  backgroundColor: null,
   dom: null,
   setDom: () => {},
   error: null,
@@ -140,6 +143,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     items: SceneDataDto["items"];
     transitionGroups: SceneDataDto["transitionGroups"];
     transitions: Transition[];
+    backgroundColor?: string | null;
   }>({
     name: null,
     description: null,
@@ -148,6 +152,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     items: [],
     transitionGroups: [],
     transitions: [],
+    backgroundColor: null,
   });
 
   const isFetchingRef = useRef(false);
@@ -170,6 +175,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     SceneDataDto["transitionGroups"]
   >([]);
   const [transitions, setTransitions] = useState<Transition[]>([]);
+  const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
 
   const [dom, setDom] = useState<HTMLElement | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -199,6 +205,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
           response.data.transitionGroups.flatMap((group) => group.transitions)
         );
         setCamera(response.data.camera);
+        setBackgroundColor(response.backgroundColor);
       } catch (error) {
         setError(error as Error);
       } finally {
@@ -247,6 +254,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
       items,
       transitionGroups,
       transitions,
+      backgroundColor,
     };
   }, [
     name,
@@ -256,6 +264,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     items,
     transitionGroups,
     transitions,
+    backgroundColor,
     dataRef,
   ]);
 
@@ -274,6 +283,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         items,
         transitionGroups,
         transitions,
+        backgroundColor,
         state: currentState,
         setState: setCurrentState,
         dom,
