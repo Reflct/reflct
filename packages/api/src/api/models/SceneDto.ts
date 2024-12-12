@@ -124,6 +124,7 @@ export const sceneSchema = z.object({
   metadata: sceneMetadataSchema.optional(),
   tags: z.array(z.string()),
   data: sceneDataSchema,
+  backgroundColor: z.string(),
   createdAt: isoDateSchema,
   updatedAt: isoDateSchema,
   publishedAt: isoDateSchema.optional(),

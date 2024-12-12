@@ -9,6 +9,7 @@ import ObjectLoader from "../ObjectLoader";
 import UI from "../UI";
 import { UIChild } from "../UI/UI";
 import styles from "./Viewer.module.css";
+import Background from "../Background";
 
 type Props = {
   id: string;
@@ -58,6 +59,7 @@ const Viewer: React.FC<Props> = ({
       }}
     >
       <div className={className || `${styles["mantel-wrapper"]}`} ref={ref}>
+        <Background />
         <Canvas>
           <CameraLoader />
           <ObjectLoader />

@@ -23,7 +23,8 @@
   "scripts": {
     "version": "lerna version",
     "build": "lerna run build",
-    "publish": "lerna publish from-git --yes"
+    "publish": "lerna publish from-git --yes",
+    "test:env": "bash __test__/create_env.sh"
   },
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "0.4.5",

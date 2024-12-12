@@ -7,6 +7,7 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/cjs/index.js",
       "import": "./dist/esm/index.js"
     }
@@ -26,8 +27,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && rollup -c",
-    "dev": "npm run clean && rollup -c -w",
-    "test": "jest"
+    "dev": "npm run clean && rollup -c -w"
   },
   "authors": [
     "In Ha Ryu <inha.ryu.97@gmail.com>"
