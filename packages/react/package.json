@@ -1,6 +1,6 @@
 {
   "name": "@reflct/react",
-  "version": "0.0.1-alpha.7",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -63,7 +63,7 @@
     "@mkkellogg/gaussian-splats-3d": "0.4.5",
     "@react-three/drei": "^9.92.7",
     "@react-three/fiber": "^8.15.12",
-    "@reflct/api": "^0.0.1-alpha.7",
+    "@reflct/api": "^0.0.2",
     "gsap": "^3.12.5",
     "three": "^0.168.0"
   }
