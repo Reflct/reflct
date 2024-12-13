@@ -68,7 +68,7 @@ cat $tmp_dir/.env | sed 's/SCENE_ID/NEXT_PUBLIC_SCENE_ID/g' | sed 's/REFLCT_API_
 (cd $env_dir/vite-test; npm install ../reflct-react.tgz)
 
 # Update App.tsx
-cat > $tmp_dir/vite-test/src/App.tsx << 'EOL'
+cat > $env_dir/vite-test/src/App.tsx << 'EOL'
 "use client";
 
 import { Viewer } from "@reflct/react";
@@ -88,6 +88,6 @@ function App() {
 export default App;
 EOL
 
-cat $root_dir/.env | sed 's/SCENE_ID/VITE_SCENE_ID/g' | sed 's/REFLCT_API_KEY/VITE_API_KEY/g' > $tmp_dir/vite-test/.env
+cat $root_dir/.env | sed 's/SCENE_ID/VITE_SCENE_ID/g' | sed 's/REFLCT_API_KEY/VITE_API_KEY/g' > $env_dir/vite-test/.env
 
 echo "Setup complete! Test environments created in $tmp_dir"
