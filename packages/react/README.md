@@ -222,9 +222,9 @@ If this is not possible, you can disable SharedArrayBuffer by setting the `share
 />
 ```
 
-## Licence
+## License
 
-This project is MIT licensed.
+See license in [LICENSE](./LICENSE)
 
 ## Authors
 
