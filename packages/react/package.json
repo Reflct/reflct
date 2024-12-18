@@ -32,7 +32,7 @@
   "authors": [
     "In Ha Ryu <inha.ryu.97@gmail.com>"
   ],
-  "license": "SEE LICENSE IN ./LICENSE",
+  "license": "MIT",
   "devDependencies": {
     "@react-three/drei": "^9.92.7",
     "@react-three/fiber": "^8.15.12",

@@ -26,7 +26,7 @@
   "authors": [
     "In Ha Ryu <inha.ryu.97@gmail.com>"
   ],
-  "license": "SEE LICENSE IN ./LICENSE",
+  "license": "MIT",
   "devDependencies": {
     "@types/cross-spawn": "^6.0.6",
     "@types/prompts": "^2.4.9",

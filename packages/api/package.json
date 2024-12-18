@@ -31,7 +31,7 @@
   "authors": [
     "In Ha Ryu <inha.ryu.97@gmail.com>"
   ],
-  "license": "SEE LICENSE IN ./LICENSE",
+  "license": "MIT",
   "devDependencies": {
     "dotenv": "^16.4.7",
     "esbuild": "0.24.0"

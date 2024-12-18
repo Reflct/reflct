@@ -49,6 +49,7 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
     }
 
     const targetItem = currentTransition.item;
+    console.log(targetItem);
 
     if (
       camera &&
@@ -79,6 +80,9 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
         targetItem.lookAt[2]
       );
 
+      const originalZoom = camera.zoom;
+      const targetZoom = targetItem.zoom;
+
       if (!loadedRef.current) {
         control.setLookAt(
           targetPosition.x,
@@ -89,6 +93,7 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
           targetLootAt.z,
           false
         );
+        control.zoomTo(targetZoom, false);
 
         control.disconnect();
         control.normalizeRotations();
@@ -143,6 +148,12 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
               .clone()
               .lerp(targetLootAt, reference.progress);
 
+            const currentZoom = THREE.MathUtils.lerp(
+              originalZoom,
+              targetZoom,
+              reference.progress
+            );
+
             control.setLookAt(
               currentPosition.x,
               currentPosition.y,
@@ -152,6 +163,8 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
               currentLookAt.z,
               false
             );
+
+            control.zoomTo(currentZoom, false);
 
             control.disconnect();
             control.normalizeRotations();
@@ -215,10 +228,10 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
           camera,
           {
             fov: targetItem.fov,
-            aspect: targetItem.aspect,
+            // aspect: targetItem.aspect,
             near: targetItem.near,
             far: targetItem.far,
-            zoom: targetItem.zoom,
+            // zoom: targetItem.zoom,
             duration: currentTransition.duration,
             ease: currentTransition.easing,
           },
@@ -257,7 +270,6 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
         return;
       }
 
-      console.log("setting look at");
       (async () => {
         await control?.setLookAt(
           position[0],
@@ -268,6 +280,7 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
           lookAt[2],
           false
         );
+        await control.zoomTo(zoom, false);
 
         control.disconnect();
         control.normalizeRotations();
@@ -297,7 +310,6 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
       <PerspectiveCamera
         ref={ref}
         fov={fov}
-        aspect={aspect}
         near={near}
         far={far}
         position={position as THREE.Vector3Tuple}
