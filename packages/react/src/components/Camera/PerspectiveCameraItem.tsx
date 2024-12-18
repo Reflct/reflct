@@ -49,7 +49,6 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
     }
 
     const targetItem = currentTransition.item;
-    console.log(targetItem);
 
     if (
       camera &&
