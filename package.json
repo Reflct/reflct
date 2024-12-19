@@ -23,6 +23,7 @@
   "scripts": {
     "version": "lerna version",
     "build": "lerna run build",
+    "test:env": "bash __test__/create_env.sh",
     "test:env:local": "bash __test__/create_env_development.sh",
     "test:env:staging": "bash __test__/create_env_staging.sh",
     "test:env:prod": "bash __test__/create_env_prod.sh",
