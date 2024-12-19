@@ -19,8 +19,8 @@ echo "env_dir: $env_dir"
 # Copy everything except node_modules
 rsync -av --exclude='node_modules' --exclude='.git' $root_dir/ $tmp_dir/
 
-cp $tmp_dir/.env $tmp_dir/packages/api/.env
-cp $tmp_dir/.env $tmp_dir/packages/react/.env
+cp $tmp_dir/.env.development.local $tmp_dir/packages/api/.env
+cp $tmp_dir/.env.development.local $tmp_dir/packages/react/.env
 
 (cd $tmp_dir; npm install)
 
@@ -60,7 +60,7 @@ export default function Home() {
 }
 EOL
 
-cat $tmp_dir/.env | sed 's/SCENE_ID/NEXT_PUBLIC_SCENE_ID/g' | sed 's/REFLCT_API_KEY/NEXT_PUBLIC_REFLCT_API_KEY/g' > $env_dir/next-test/.env
+cat $tmp_dir/.env.development.local | sed 's/SCENE_ID/NEXT_PUBLIC_SCENE_ID/g' | sed 's/REFLCT_API_KEY/NEXT_PUBLIC_REFLCT_API_KEY/g' > $env_dir/next-test/.env
 
 # # Create React app
 # echo "Creating React app..."
@@ -88,6 +88,6 @@ function App() {
 export default App;
 EOL
 
-cat $root_dir/.env | sed 's/SCENE_ID/VITE_SCENE_ID/g' | sed 's/REFLCT_API_KEY/VITE_API_KEY/g' > $env_dir/vite-test/.env
+cat $tmp_dir/.env.development.local | sed 's/SCENE_ID/VITE_SCENE_ID/g' | sed 's/REFLCT_API_KEY/VITE_API_KEY/g' > $env_dir/vite-test/.env
 
 echo "Setup complete! Test environments created in $tmp_dir"

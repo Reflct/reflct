@@ -33,3 +33,6 @@ report.*.json
 
 /dist
 /tmp
+
+*.tar
+*.tgz
