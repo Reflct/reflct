@@ -15,6 +15,12 @@ jobs:
           node-version: lts/*
       - name: Install dependencies
         run: npm ci
+      - name: Create .env file
+        run: |
+          echo "NODE_ENV=production" >> .env
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> .env
+          echo "SCENE_ID=${{ secrets.SCENE_ID }}" >> .env
+          echo "REFLCT_API_KEY=${{ secrets.REFLCT_API_KEY }}" >> .env
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
