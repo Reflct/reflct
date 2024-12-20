@@ -27,14 +27,25 @@ export async function buildAndPackageModules(
       path.join(paths.tmpDir, "packages/react/.env")
     );
 
-    // Install dependencies
-    execSync("npm install", { cwd: paths.tmpDir, stdio: "inherit" });
+    // Install dependencies with NODE_ENV set
+    execSync("npm install", {
+      cwd: paths.tmpDir,
+      stdio: "inherit",
+      env: { ...process.env, NODE_ENV: "production" },
+    });
 
-    // Build and pack API
+    // Build API package with explicit Node options
     execSync("npm run build", {
       cwd: path.join(paths.tmpDir, "packages/api"),
       stdio: "inherit",
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        NODE_OPTIONS: "--experimental-vm-modules",
+      },
     });
+
+    // Pack API
     execSync("npm pack", {
       cwd: path.join(paths.tmpDir, "packages/api"),
       stdio: "inherit",
@@ -60,12 +71,18 @@ export async function buildAndPackageModules(
       stdio: "inherit",
     });
 
-    // Build and pack React
+    // Build React package with explicit Node options
     execSync("npm run build", {
       cwd: path.join(paths.tmpDir, "packages/react"),
       stdio: "inherit",
-      env: { ...process.env, NODE_ENV: "production" },
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        NODE_OPTIONS: "--experimental-vm-modules",
+      },
     });
+
+    // Pack React
     execSync("npm pack", {
       cwd: path.join(paths.tmpDir, "packages/react"),
       stdio: "inherit",
