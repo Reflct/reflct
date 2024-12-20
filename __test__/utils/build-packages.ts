@@ -10,8 +10,8 @@ export async function buildAndPackageModules(
   paths: BuildConfig
 ): Promise<void> {
   try {
+    // Copy everything except node_modules and .git
     if (!process.env.CI) {
-      // Copy everything except node_modules and .git
       execSync(
         `rsync -av --exclude='node_modules' --exclude='.git' ${paths.rootDir}/ ${paths.tmpDir}/`
       );
@@ -27,25 +27,14 @@ export async function buildAndPackageModules(
       path.join(paths.tmpDir, "packages/react/.env")
     );
 
-    // Install dependencies with NODE_ENV set
-    execSync("npm install", {
-      cwd: paths.tmpDir,
-      stdio: "inherit",
-      env: { ...process.env, NODE_ENV: "production" },
-    });
+    // Install dependencies
+    execSync("npm install", { cwd: paths.tmpDir, stdio: "inherit" });
 
-    // Build API package with explicit Node options
+    // Build and pack API
     execSync("npm run build", {
       cwd: path.join(paths.tmpDir, "packages/api"),
       stdio: "inherit",
-      env: {
-        ...process.env,
-        NODE_ENV: "production",
-        NODE_OPTIONS: "--experimental-vm-modules",
-      },
     });
-
-    // Pack API
     execSync("npm pack", {
       cwd: path.join(paths.tmpDir, "packages/api"),
       stdio: "inherit",
@@ -71,18 +60,12 @@ export async function buildAndPackageModules(
       stdio: "inherit",
     });
 
-    // Build React package with explicit Node options
+    // Build and pack React
     execSync("npm run build", {
       cwd: path.join(paths.tmpDir, "packages/react"),
       stdio: "inherit",
-      env: {
-        ...process.env,
-        NODE_ENV: "production",
-        NODE_OPTIONS: "--experimental-vm-modules",
-      },
+      env: { ...process.env, NODE_ENV: "production" },
     });
-
-    // Pack React
     execSync("npm pack", {
       cwd: path.join(paths.tmpDir, "packages/react"),
       stdio: "inherit",
