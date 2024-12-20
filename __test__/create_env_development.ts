@@ -26,11 +26,15 @@ if (!validEnvs.includes(environment as Environment)) {
   process.exit(1);
 }
 
+const tmpDir = process.env.CI
+  ? process.cwd()
+  : fs.mkdtempSync(path.join(os.tmpdir(), "reflct-test"));
+
 // Create temporary directory
 const paths: BuildConfig = {
   rootDir: process.cwd(),
-  tmpDir: fs.mkdtempSync(path.join(os.tmpdir(), "reflct-")),
-  envDir: path.join(fs.mkdtempSync(path.join(os.tmpdir(), "reflct-")), "tmp"),
+  tmpDir: tmpDir,
+  envDir: path.join(tmpDir, "tmp"),
   envFile,
 };
 

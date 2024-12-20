@@ -10,10 +10,12 @@ export async function buildAndPackageModules(
   paths: BuildConfig
 ): Promise<void> {
   try {
-    // Copy everything except node_modules and .git
-    execSync(
-      `rsync -av --exclude='node_modules' --exclude='.git' ${paths.rootDir}/ ${paths.tmpDir}/`
-    );
+    if (!process.env.CI) {
+      // Copy everything except node_modules and .git
+      execSync(
+        `rsync -av --exclude='node_modules' --exclude='.git' ${paths.rootDir}/ ${paths.tmpDir}/`
+      );
+    }
 
     // Copy env files based on environment
     fs.copyFileSync(
@@ -28,21 +30,10 @@ export async function buildAndPackageModules(
     // Install dependencies
     execSync("npm install", { cwd: paths.tmpDir, stdio: "inherit" });
 
-    if (process.env.CI) {
-      // In CI environment, run the root build first
-      execSync("npm run build", {
-        cwd: paths.tmpDir,
-        stdio: "inherit",
-        env: { ...process.env, NODE_ENV: "production" },
-      });
-    }
-
     // Build and pack API
-    console.log("Building API package...");
     execSync("npm run build", {
       cwd: path.join(paths.tmpDir, "packages/api"),
       stdio: "inherit",
-      env: { ...process.env, NODE_ENV: "production" },
     });
     execSync("npm pack", {
       cwd: path.join(paths.tmpDir, "packages/api"),
@@ -69,20 +60,11 @@ export async function buildAndPackageModules(
       stdio: "inherit",
     });
 
-    // Install dependencies in React package
-    console.log("Installing React package dependencies...");
-    execSync("npm install", {
-      cwd: path.join(paths.tmpDir, "packages/react"),
-      stdio: "inherit",
-      env: { ...process.env, NODE_ENV: "production" },
-    });
-
     // Build and pack React
-    console.log("Building React package...");
     execSync("npm run build", {
       cwd: path.join(paths.tmpDir, "packages/react"),
       stdio: "inherit",
-      env: { ...process.env, NODE_ENV: "production", DEBUG: "true" },
+      env: { ...process.env, NODE_ENV: "production" },
     });
     execSync("npm pack", {
       cwd: path.join(paths.tmpDir, "packages/react"),
@@ -110,10 +92,6 @@ export async function buildAndPackageModules(
     );
   } catch (error) {
     console.error("Build error:", error);
-    if (error instanceof Error) {
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
-    }
     throw error;
   }
 }
