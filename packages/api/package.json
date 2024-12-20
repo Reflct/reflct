@@ -26,7 +26,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && node esbuild.mjs && tsc --emitDeclarationOnly --outDir dist"
+    "build": "node esbuild.mjs && tsc --emitDeclarationOnly --outDir dist"
   },
   "authors": [
     "In Ha Ryu <inha.ryu.97@gmail.com>"

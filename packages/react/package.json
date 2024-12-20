@@ -26,8 +26,8 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && rollup -c",
-    "dev": "npm run clean && rollup -c -w"
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
   },
   "authors": [
     "In Ha Ryu <inha.ryu.97@gmail.com>"
