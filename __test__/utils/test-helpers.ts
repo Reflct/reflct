@@ -22,7 +22,9 @@ export async function setupTestEnvironment(
   const envFile =
     environment === "production" ? ".env" : `.env.${environment}.local`;
 
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "reflct-test"));
+  const tmpDir = process.env.CI
+    ? process.cwd()
+    : fs.mkdtempSync(path.join(os.tmpdir(), "reflct-test"));
 
   const paths: BuildConfig = {
     rootDir: process.cwd(),

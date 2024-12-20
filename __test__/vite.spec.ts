@@ -29,6 +29,9 @@ test.describe("Visual Regression Tests", () => {
             waitUntil: "networkidle",
           });
 
+          // Wait for 5 seconds
+          await page.waitForTimeout(5000);
+
           const snapshotName = `vite-viewer-${environment}`;
 
           // Take snapshot
