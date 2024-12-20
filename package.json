@@ -2,6 +2,7 @@
   "name": "reflct",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "authors": [
     "In Ha Ryu <inha.ryu.97@gmail.com>"
   ],
@@ -17,17 +18,23 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.25.9",
     "@babel/preset-typescript": "^7.26.0",
+    "@playwright/test": "^1.49.1",
     "@rollup/plugin-babel": "^6.0.4",
-    "lerna": "^8.1.9"
+    "@types/node": "^22.10.2",
+    "lerna": "^8.1.9",
+    "ts-node": "^10.9.2"
   },
   "scripts": {
     "version": "lerna version",
     "build": "lerna run build",
     "test:env": "bash __test__/create_env.sh",
-    "test:env:local": "bash __test__/create_env_development.sh",
-    "test:env:staging": "bash __test__/create_env_staging.sh",
-    "test:env:prod": "bash __test__/create_env_prod.sh",
-    "pack": "lerna exec -- npm pack"
+    "test:env:local": "node --loader ts-node/esm __test__/create_env_development.ts development",
+    "test:env:staging": "node --loader ts-node/esm __test__/create_env_development.ts staging",
+    "test:env:prod": "node --loader ts-node/esm __test__/create_env_development.ts production",
+    "pack": "lerna exec -- npm pack",
+    "test:snapshot": "playwright test **/*.spec.ts",
+    "test:snapshot:ui": "playwright test **/*.spec.ts --ui",
+    "test:snapshot:update": "playwright test **/*.spec.ts --update-snapshots"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.31.0",
