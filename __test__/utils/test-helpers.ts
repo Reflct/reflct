@@ -6,6 +6,16 @@ import path from "node:path";
 import { buildAndPackageModules } from "./build-packages.js";
 import type { BuildConfig } from "./types.js";
 
+export function getEnvironmentFromTestName(
+  testName: string
+): "development" | "staging" | "production" {
+  if (testName.includes("(staging)")) return "staging";
+  if (testName.includes("(production)")) return "production";
+  if (testName.includes("(development)")) return "development";
+
+  return "development"; // fallback
+}
+
 export async function setupTestEnvironment(
   environment: "development" | "staging" | "production" = "development"
 ): Promise<BuildConfig> {

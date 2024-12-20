@@ -32,9 +32,12 @@
     "test:env:staging": "node --loader ts-node/esm __test__/create_env_development.ts staging",
     "test:env:prod": "node --loader ts-node/esm __test__/create_env_development.ts production",
     "pack": "lerna exec -- npm pack",
-    "test:snapshot": "playwright test **/*.spec.ts",
-    "test:snapshot:ui": "playwright test **/*.spec.ts --ui",
-    "test:snapshot:update": "playwright test **/*.spec.ts --update-snapshots"
+    "test:snapshot:dev": "playwright test **/*.spec.ts --grep \"development\"",
+    "test:snapshot:staging": "playwright test **/*.spec.ts --grep \"staging\"",
+    "test:snapshot:prod": "playwright test **/*.spec.ts --grep \"production\"",
+    "test:snapshot:dev:update": "playwright test **/*.spec.ts --grep \"development\" --update-snapshots",
+    "test:snapshot:staging:update": "playwright test **/*.spec.ts --grep \"staging\" --update-snapshots",
+    "test:snapshot:prod:update": "playwright test **/*.spec.ts --grep \"production\" --update-snapshots"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.31.0",

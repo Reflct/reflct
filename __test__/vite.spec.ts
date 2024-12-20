@@ -5,39 +5,47 @@ import {
   setupTestEnvironment,
   startViteProject,
   takeSnapshot,
+  getEnvironmentFromTestName,
 } from "./utils/test-helpers.js";
 
+const environments = ["development", "staging", "production"] as const;
+
 test.describe("Visual Regression Tests", () => {
-  test("Vite project snapshot", async ({ page }, testInfo) => {
-    const paths = await setupTestEnvironment("development");
-
-    try {
-      // Setup Vite project
-      await setupVite(paths);
-
-      // Start the project
-      const { port, cleanup } = await startViteProject(paths);
+  for (const env of environments) {
+    test(`Vite project snapshot (${env})`, async ({ page }, testInfo) => {
+      const environment = getEnvironmentFromTestName(testInfo.title);
+      const paths = await setupTestEnvironment(environment);
 
       try {
-        // Navigate to the page
-        await page.goto(`http://localhost:${port}`, {
-          waitUntil: "networkidle",
-        });
+        // Setup Vite project
+        await setupVite(paths);
 
-        // Take snapshot
-        await takeSnapshot(page, "vite-viewer", testInfo);
+        // Start the project
+        const { port, cleanup } = await startViteProject(paths);
 
-        // Compare with baseline
-        await expect(await page.screenshot({ fullPage: true })).toMatchSnapshot(
-          "vite-viewer.png"
-        );
+        try {
+          // Navigate to the page
+          await page.goto(`http://localhost:${port}`, {
+            waitUntil: "networkidle",
+          });
+
+          const snapshotName = `vite-viewer-${environment}`;
+
+          // Take snapshot
+          await takeSnapshot(page, snapshotName, testInfo);
+
+          // Compare with baseline
+          await expect(
+            await page.screenshot({ fullPage: true })
+          ).toMatchSnapshot(`${snapshotName}.png`);
+        } finally {
+          cleanup();
+        }
       } finally {
-        cleanup();
+        // Cleanup temp directories
+        fs.rmSync(paths.tmpDir, { recursive: true, force: true });
+        fs.rmSync(paths.envDir, { recursive: true, force: true });
       }
-    } finally {
-      // Cleanup temp directories
-      fs.rmSync(paths.tmpDir, { recursive: true, force: true });
-      fs.rmSync(paths.envDir, { recursive: true, force: true });
-    }
-  });
+    });
+  }
 });

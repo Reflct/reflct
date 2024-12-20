@@ -5,39 +5,47 @@ import {
   setupTestEnvironment,
   startNextJsProject,
   takeSnapshot,
+  getEnvironmentFromTestName,
 } from "./utils/test-helpers.js";
 
+const environments = ["development", "staging", "production"] as const;
+
 test.describe("Visual Regression Tests", () => {
-  test("Next.js project snapshot", async ({ page }, testInfo) => {
-    const paths = await setupTestEnvironment("development");
-
-    try {
-      // Setup Next.js project
-      await setupNextJs(paths);
-
-      // Start the project
-      const { port, cleanup } = await startNextJsProject(paths);
+  for (const env of environments) {
+    test(`Next.js project snapshot (${env})`, async ({ page }, testInfo) => {
+      const environment = getEnvironmentFromTestName(testInfo.title);
+      const paths = await setupTestEnvironment(environment);
 
       try {
-        // Navigate to the page
-        await page.goto(`http://localhost:${port}`, {
-          waitUntil: "networkidle",
-        });
+        // Setup Next.js project
+        await setupNextJs(paths);
 
-        // Take snapshot
-        await takeSnapshot(page, "nextjs-viewer", testInfo);
+        // Start the project
+        const { port, cleanup } = await startNextJsProject(paths);
 
-        // Compare with baseline
-        await expect(await page.screenshot({ fullPage: true })).toMatchSnapshot(
-          "nextjs-viewer.png"
-        );
+        try {
+          // Navigate to the page
+          await page.goto(`http://localhost:${port}`, {
+            waitUntil: "networkidle",
+          });
+
+          const snapshotName = `nextjs-viewer-${environment}`;
+
+          // Take snapshot
+          await takeSnapshot(page, snapshotName, testInfo);
+
+          // Compare with baseline
+          await expect(
+            await page.screenshot({ fullPage: true })
+          ).toMatchSnapshot(`${snapshotName}.png`);
+        } finally {
+          cleanup();
+        }
       } finally {
-        cleanup();
+        // Cleanup temp directories
+        fs.rmSync(paths.tmpDir, { recursive: true, force: true });
+        fs.rmSync(paths.envDir, { recursive: true, force: true });
       }
-    } finally {
-      // Cleanup temp directories
-      fs.rmSync(paths.tmpDir, { recursive: true, force: true });
-      fs.rmSync(paths.envDir, { recursive: true, force: true });
-    }
-  });
+    });
+  }
 });
