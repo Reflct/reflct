@@ -23,6 +23,8 @@ jobs:
           echo "REFLCT_API_KEY=${{ secrets.REFLCT_API_KEY }}" >> .env
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Install Node Modules
+        run: npm install
       - name: Run Playwright tests
         run: npm run test:snapshot:prod
         env:
