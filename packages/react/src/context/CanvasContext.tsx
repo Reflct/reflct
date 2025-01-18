@@ -65,6 +65,8 @@ export type CanvasContextEventsType = {
 type CanvasContextType = CanvasContextBaseType & {
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
+  loadProgress: number;
+  setLoadProgress: (loadProgress: number) => void;
   automode: boolean;
   setAutomode: (automode: boolean) => void;
 
@@ -100,6 +102,8 @@ export const CanvasContext = createContext<CanvasContextType>({
   id: "",
   apikey: "",
   isLoading: true,
+  loadProgress: 0,
+  setLoadProgress: () => {},
   automode: false,
   setAutomode: () => {},
   name: null,
@@ -157,6 +161,8 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
 
   const isFetchingRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
+
   const [automode, setAutomode] = useState(false);
   const [currentState, setCurrentState] = useState(state);
 
@@ -276,6 +282,8 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         setIsLoading,
         automode,
         setAutomode,
+        loadProgress,
+        setLoadProgress,
         name,
         description,
         metadata,
