@@ -14,8 +14,13 @@ const GS3dItem: React.FC<Props> = (props) => {
   const { src, position, rotation, scale } = props;
 
   const { scene, gl, camera } = useThree();
-  const { setIsLoading, eventsRef, dataRef, sharedMemoryForWorkers } =
-    useCanvasContext();
+  const {
+    setLoadProgress,
+    setIsLoading,
+    eventsRef,
+    dataRef,
+    sharedMemoryForWorkers,
+  } = useCanvasContext();
 
   const viewerRef = useRef<any>(null);
   const transformMesh = useRef<any>(null);
@@ -81,6 +86,7 @@ const GS3dItem: React.FC<Props> = (props) => {
             progress = percentComplete;
 
             eventsRef.current.onLoadProgressUpdate?.(progress / 100);
+            setLoadProgress(progress / 100);
           }
         },
       })

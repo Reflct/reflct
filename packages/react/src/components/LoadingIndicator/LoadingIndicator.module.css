@@ -11,15 +11,27 @@
   align-items: center;
 }
 
-.spin {
-  animation: spin 1s linear infinite;
+.reflct-loader .loader-container {
+  width: 360px;
+  height: 6px;
+  background-color: #71717a;
+  border-radius: 9999px;
+  overflow: hidden;
+  animation: grow 0.5s ease-in-out;
+  max-width: 80%;
 }
 
-@keyframes spin {
+@keyframes grow {
   from {
-    transform: rotate(0deg);
+    width: 0;
   }
   to {
-    transform: rotate(360deg);
+    width: 360px;
   }
+}
+
+.reflct-loader .loader-container .loader-bar {
+  height: 100%;
+  background-color: #3392ff;
+  transition: width 0.2s ease-in-out;
 }
