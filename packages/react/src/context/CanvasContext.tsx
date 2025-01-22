@@ -1,3 +1,6 @@
+//@ts-expect-error
+import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
+
 import gsap from "gsap";
 import React, {
   createContext,
@@ -19,6 +22,7 @@ type CanvasContextBaseType = {
   apikey: string;
   isPreview?: boolean;
   sharedMemoryForWorkers?: boolean;
+  sceneRevealMode?: "instant" | "gradual";
   state?: number;
 };
 
@@ -121,6 +125,7 @@ export const CanvasContext = createContext<CanvasContextType>({
   setDom: () => {},
   error: null,
   sharedMemoryForWorkers: false,
+  sceneRevealMode: GaussianSplats3D.SceneRevealMode,
   eventsRef: { current: {} },
   dataRef: { current: {} },
 });
@@ -136,7 +141,14 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
   events,
   children,
 }) => {
-  const { id, apikey, state = 0, isPreview, sharedMemoryForWorkers } = value;
+  const {
+    id,
+    apikey,
+    state = 0,
+    isPreview,
+    sharedMemoryForWorkers,
+    sceneRevealMode,
+  } = value;
 
   const eventsRef = useRef<CanvasContextEventsType>(events);
   const dataRef = useRef<{
@@ -298,6 +310,10 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         setDom,
         error,
         sharedMemoryForWorkers,
+        sceneRevealMode:
+          sceneRevealMode === "instant"
+            ? GaussianSplats3D.SceneRevealMode.Instant
+            : GaussianSplats3D.SceneRevealMode.Gradual,
         eventsRef,
         dataRef,
       }}

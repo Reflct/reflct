@@ -16,6 +16,7 @@ export type UIChild = (state: {
   automode: boolean;
   setAutomode: (automode: boolean) => void;
   isLoading: boolean;
+  loadProgress: number;
   nextView: () => void;
   prevView: () => void;
 }) => React.ReactNode;
@@ -27,6 +28,7 @@ type Props = {
 const UI: React.FC<Props> = ({ ui }) => {
   const {
     isLoading,
+    loadProgress,
     automode,
     setAutomode,
     state,
@@ -73,6 +75,7 @@ const UI: React.FC<Props> = ({ ui }) => {
       automode,
       setAutomode,
       isLoading,
+      loadProgress,
       nextView,
       prevView,
     });

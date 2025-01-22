@@ -17,6 +17,7 @@ type Props = {
   isPreview?: boolean;
   sharedMemoryForWorkers?: boolean;
   className?: string;
+  sceneRevealMode?: "instant" | "gradual";
 
   // renders
   children?: UIChild;
@@ -27,6 +28,7 @@ const Viewer: React.FC<Props> = ({
   apikey,
   isPreview = false,
   sharedMemoryForWorkers = true,
+  sceneRevealMode = "gradual",
   className,
 
   // events
@@ -48,7 +50,7 @@ const Viewer: React.FC<Props> = ({
 
   return (
     <CanvasContextProvider
-      value={{ id, apikey, isPreview, sharedMemoryForWorkers }}
+      value={{ id, apikey, isPreview, sharedMemoryForWorkers, sceneRevealMode }}
       events={{
         onLoadStart,
         onLoadProgressUpdate,

@@ -20,6 +20,7 @@ const GS3dItem: React.FC<Props> = (props) => {
     eventsRef,
     dataRef,
     sharedMemoryForWorkers,
+    sceneRevealMode,
   } = useCanvasContext();
 
   const viewerRef = useRef<any>(null);
@@ -59,7 +60,7 @@ const GS3dItem: React.FC<Props> = (props) => {
       dynamicScene: true,
       // webXRMode: GaussianSplats3D.WebXRMode.None,
       renderMode: GaussianSplats3D.RenderMode.OnChange,
-      sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
+      sceneRevealMode,
       // antialiased: false,
       // focalAdjustment: 1.0,
 
