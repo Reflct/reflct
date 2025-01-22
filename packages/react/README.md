@@ -43,6 +43,7 @@ Viewer component has props for listening to events and customizing the UI.
   apikey={"your-apikey"}
   isPreview={true}
   sharedMemoryForWorkers={false}
+  sceneRevealMode="gradual"
   className={"your-class-name"}
   // events
   onLoadStart={() => {}}
@@ -56,13 +57,14 @@ Viewer component has props for listening to events and customizing the UI.
 
 Here are the basic props for the Viewer component:
 
-| Props                  | Type    | Description                              |
-| ---------------------- | ------- | ---------------------------------------- |
-| id                     | string  | Your scene id                            |
-| apikey                 | string  | Your api key                             |
-| isPreview              | boolean | Whether to use preview scene             |
-| sharedMemoryForWorkers | boolean | Whether to use shared memory for workers |
-| className              | string  | class name for the viewer                |
+| Props                  | Type                   | Description                              |
+| ---------------------- | ---------------------- | ---------------------------------------- |
+| id                     | string                 | Your scene id                            |
+| apikey                 | string                 | Your api key                             |
+| isPreview              | boolean                | Whether to use preview scene             |
+| sceneRevealMode        | "instant" or "gradual" | Set to reveal scene Gradually or Instant |
+| sharedMemoryForWorkers | boolean                | Whether to use shared memory for workers |
+| className              | string                 | class name for the viewer                |
 
 These are the events fired by the Viewer component:
 
@@ -174,6 +176,7 @@ If you wish to customise the UIs of the viewer component, you can do those by gi
     automode,
     setAutomode,
     isLoading,
+    loadProgress,
     nextView,
     prevView,
   }) => {
@@ -191,6 +194,7 @@ If you wish to customise the UIs of the viewer component, you can do those by gi
 | automode         | boolean                                                                                            | Whether the automode is enabled         |
 | setAutomode      | function (automode: boolean)                                                                       | The function to set the automode        |
 | isLoading        | boolean                                                                                            | Whether the scene is loading            |
+| loadProgress     | number                                                                                             | The progress of the scene loading       |
 | nextView         | function (() => void)                                                                              | The function to go to the next view     |
 | prevView         | function (() => void)                                                                              | The function to go to the previous view |
 
