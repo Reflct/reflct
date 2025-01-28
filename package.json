@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.31.0",
-    "@mkkellogg/gaussian-splats-3d": "0.4.5",
+    "@mkkellogg/gaussian-splats-3d": "0.4.7",
     "concurrently": "^9.0.1"
   }
 }
