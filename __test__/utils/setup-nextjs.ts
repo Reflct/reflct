@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { BuildConfig } from "./types.js";
 
-export async function setupNextJs(paths: BuildConfig): Promise<void> {
+export async function setupNextJs14(paths: BuildConfig): Promise<void> {
   console.log("Creating Next.js app...");
   const nextTestEnv = path.join(paths.envDir, "next-test");
 
@@ -45,5 +45,48 @@ export default function Home() {
 
   fs.writeFileSync(path.join(nextTestEnv, ".env"), nextEnvContent);
 
-  console.log(`Created Next.js project in ${nextTestEnv}`);
+  console.log(`Created Next.js 14 project in ${nextTestEnv}`);
+}
+
+export async function setupNextJs15(paths: BuildConfig): Promise<void> {
+  console.log("Creating Next.js app...");
+  const nextTestEnv = path.join(paths.envDir, "next-test");
+
+  execSync("npx create-next-app@15 next-test --yes", { cwd: paths.envDir });
+
+  execSync("npm install ../reflct-react.tgz", {
+    cwd: path.join(paths.envDir, "next-test"),
+  });
+
+  // Create Next.js example page
+  const nextPageContent = `"use client";
+
+import { Viewer } from "@reflct/react";
+
+export default function Home() {
+  return (
+    <main style={{ width: "100vw", height: "100vh" }}>
+      <Viewer
+        id={process.env.NEXT_PUBLIC_SCENE_ID || ""}
+        apikey={process.env.NEXT_PUBLIC_REFLCT_API_KEY || ""}
+        sharedMemoryForWorkers={false}
+      />
+    </main>
+  );
+}`;
+
+  fs.writeFileSync(
+    path.join(paths.envDir, "next-test/app/page.tsx"),
+    nextPageContent
+  );
+
+  // Create Next.js env file
+  const nextEnvContent = fs
+    .readFileSync(path.join(paths.tmpDir, paths.envFile), "utf8")
+    .replace(/SCENE_ID/g, "NEXT_PUBLIC_SCENE_ID")
+    .replace(/REFLCT_API_KEY/g, "NEXT_PUBLIC_REFLCT_API_KEY");
+
+  fs.writeFileSync(path.join(nextTestEnv, ".env"), nextEnvContent);
+
+  console.log(`Created Next.js 15 project in ${nextTestEnv}`);
 }

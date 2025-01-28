@@ -34,20 +34,20 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@react-three/drei": "^9.92.7",
-    "@react-three/fiber": "^8.15.12",
+    "@react-three/drei": "10.0.0-rc.0",
+    "@react-three/fiber": "^9.0.0-rc.4",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/react": "^18.3.8",
+    "@types/react": "^19.0.8",
     "dotenv": "^16.4.5",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "postcss": "^8.4.47",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "rollup": "^4.22.4",
     "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
@@ -57,12 +57,12 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
-    "react": "^18.3.1"
+    "react": "^19.0.0"
   },
   "dependencies": {
-    "@mkkellogg/gaussian-splats-3d": "0.4.5",
-    "@react-three/drei": "^9.92.7",
-    "@react-three/fiber": "^8.15.12",
+    "@mkkellogg/gaussian-splats-3d": "0.4.7",
+    "@react-three/drei": "10.0.0-rc.0",
+    "@react-three/fiber": "^9.0.0-rc.4",
     "@reflct/api": "^0.0.5",
     "gsap": "^3.12.5",
     "three": "^0.168.0"

@@ -10,7 +10,7 @@ import {
 
 const environments = ["development", "staging", "production"] as const;
 
-test.describe("Visual Regression Tests", () => {
+test.describe("Visual Regression Tests - Vite", () => {
   for (const env of environments) {
     test(`Vite project snapshot (${env})`, async ({ page }, testInfo) => {
       const environment = getEnvironmentFromTestName(testInfo.title);
