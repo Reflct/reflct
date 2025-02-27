@@ -9,8 +9,8 @@ export async function setupVite(paths: BuildConfig): Promise<void> {
   const viteTestEnv = path.join(paths.envDir, "vite-test");
   console.log(viteTestEnv);
 
-  execSync("npm create -y vite@latest tmp/vite-test -- --template react-ts", {
-    cwd: paths.tmpDir,
+  execSync("npm create -y vite@5 vite-test -- --template react-ts", {
+    cwd: paths.envDir,
   });
   execSync("npm install ../reflct-react.tgz", {
     cwd: viteTestEnv,
