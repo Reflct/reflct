@@ -1,6 +1,6 @@
 {
   "name": "@reflct/create-reflct-app",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Create Reflect Integrated App",
   "private": true,
   "bin": {
