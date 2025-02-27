@@ -1,71 +1,34 @@
-#!/usr/bin/env node
-
-import fs from "node:fs";
-import path from "node:path";
-import os from "node:os";
-import type { Environment, BuildConfig } from "./utils/types.js";
-import { buildAndPackageModules } from "./utils/build-packages.js";
 import { setupNextJs } from "./utils/setup-nextjs.js";
 import { setupVite } from "./utils/setup-vite.js";
+import {
+  getEnvironmentFromTestName,
+  setupTestEnvironment,
+} from "./utils/test-helpers.js";
 
-// Get environment from command line arguments
-const validEnvs: Environment[] = ["development", "staging", "production"];
-const userInput = process.argv[2];
+const environments = ["development", "staging", "production"] as const;
+type Environment = (typeof environments)[number];
 
-const environment: Environment = (validEnvs.find((env) => env === userInput) ||
-  "development") as Environment;
-const envFile: string =
-  environment === "production" ? ".env" : `.env.${environment}.local`;
-
-if (!validEnvs.includes(environment as Environment)) {
+// Validate environment argument
+const envArg = process.argv[2];
+if (!envArg || !environments.includes(envArg as Environment)) {
   console.error(
-    `Error: Invalid environment "${environment}". Must be one of: ${validEnvs.join(
-      ", "
-    )}`
+    `Error: Invalid environment. Must be one of: ${environments.join(", ")}`
   );
   process.exit(1);
 }
 
-const tmpDir = process.env.CI
-  ? process.cwd()
-  : fs.mkdtempSync(path.join(os.tmpdir(), "reflct-test"));
+const environment = envArg as Environment;
 
-// Create temporary directory
-const paths: BuildConfig = {
-  rootDir: process.cwd(),
-  tmpDir: tmpDir,
-  envDir: path.join(tmpDir, "tmp"),
-  envFile,
-};
+try {
+  const paths = await setupTestEnvironment(environment);
 
-fs.mkdirSync(paths.envDir, { recursive: true });
+  console.log("paths:");
+  console.log(paths);
 
-console.log(`Environment: ${environment}`);
-console.log(`root_dir: ${paths.rootDir}`);
-console.log(`tmp_dir: ${paths.tmpDir}`);
-console.log(`env_dir: ${paths.envDir}`);
-
-let isError = false;
-
-const tasks = [
-  {
-    name: "Build and Package Modules",
-    task: () => buildAndPackageModules(paths),
-  },
-  { name: "Setup Next.js", task: () => setupNextJs(paths) },
-  { name: "Setup Vite", task: () => setupVite(paths) },
-];
-
-for (const { name, task } of tasks) {
-  try {
-    console.log(`Starting: ${name}`);
-    await task();
-    console.log(`Completed: ${name}`);
-  } catch (error) {
-    console.error(`Error in ${name}:`, error);
-    isError = true;
-  }
+  await setupVite(paths);
+  await setupNextJs(paths);
+  console.log(`Successfully set up test environment for: ${environment}`);
+} catch (error) {
+  console.error("Error setting up test environment:", error);
+  process.exit(1);
 }
-
-console.log(`Setup complete! Test environments created in ${paths.tmpDir}`);
-process.exit(isError ? 1 : 0);

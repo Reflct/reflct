@@ -22,15 +22,16 @@
     "@rollup/plugin-babel": "^6.0.4",
     "@types/node": "^22.10.2",
     "lerna": "^8.1.9",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3"
   },
   "scripts": {
     "version": "lerna version",
     "build": "lerna run build",
     "test:env": "bash __test__/create_env.sh",
-    "test:env:local": "node --loader ts-node/esm __test__/create_env_development.ts development",
-    "test:env:staging": "node --loader ts-node/esm __test__/create_env_development.ts staging",
-    "test:env:prod": "node --loader ts-node/esm __test__/create_env_development.ts production",
+    "test:env:local": "tsx __test__/create_env_development.ts development",
+    "test:env:staging": "tsx __test__/create_env_development.ts staging",
+    "test:env:prod": "tsx __test__/create_env_development.ts production",
     "pack": "lerna exec -- npm pack",
     "test:snapshot:dev": "playwright test **/*.spec.ts --grep \"development\"",
     "test:snapshot:staging": "playwright test **/*.spec.ts --grep \"staging\"",
