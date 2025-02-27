@@ -4,6 +4,7 @@ import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
 import gsap from "gsap";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -16,6 +17,7 @@ import type {
   Transition,
 } from "@reflct/api";
 import { ViewMetadata } from "../types/common";
+import { LinkedScene } from "@reflct/api";
 
 type CanvasContextBaseType = {
   id: string;
@@ -82,6 +84,11 @@ type CanvasContextType = CanvasContextBaseType & {
   transitionGroups: SceneDataDto["transitionGroups"];
   transitions: Transition[];
   backgroundColor: string | null;
+
+  summaryImage: string | null;
+  linkedScenes: LinkedScene[];
+  loadScene: (sceneId: string) => Promise<void>;
+
   state: number;
   setState: React.Dispatch<React.SetStateAction<number>>;
   dom: HTMLElement | null;
@@ -121,6 +128,10 @@ export const CanvasContext = createContext<CanvasContextType>({
   transitionGroups: [],
   transitions: [],
   backgroundColor: null,
+  summaryImage: null,
+  linkedScenes: [],
+  loadScene: () => Promise.resolve(),
+
   dom: null,
   setDom: () => {},
   error: null,
@@ -194,16 +205,18 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
   >([]);
   const [transitions, setTransitions] = useState<Transition[]>([]);
   const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
+  const [summaryImage, setSummaryImage] = useState<string | null>(null);
+  const [linkedScenes, setLinkedScenes] = useState<LinkedScene[]>([]);
 
   const [dom, setDom] = useState<HTMLElement | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    if (isFetchingRef.current) {
-      return;
-    }
+  const fetchData = useCallback(
+    async (id: string, apikey: string, isPreview?: boolean) => {
+      if (isFetchingRef.current) {
+        return;
+      }
 
-    const fetchData = async () => {
       try {
         isFetchingRef.current = true;
 
@@ -216,7 +229,6 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         setName(response.name);
         setDescription(response.description);
         setMetadata(response.metadata ?? {});
-
         setItems(response.data.items);
         setTransitionGroups(response.data.transitionGroups);
         setTransitions(
@@ -224,15 +236,21 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         );
         setCamera(response.data.camera);
         setBackgroundColor(response.backgroundColor);
+
+        setSummaryImage(response.summaryImage ?? null);
+        setLinkedScenes(response.linkedScenes);
       } catch (error) {
         setError(error as Error);
       } finally {
         isFetchingRef.current = false;
       }
-    };
+    },
+    []
+  );
 
-    fetchData();
-  }, [id, apikey, isPreview]);
+  useEffect(() => {
+    fetchData(id, apikey, isPreview);
+  }, [id, apikey, isPreview, fetchData]);
 
   useEffect(() => {
     setCurrentState(state);
@@ -304,8 +322,31 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         transitionGroups,
         transitions,
         backgroundColor,
+        summaryImage,
+        linkedScenes,
+
         state: currentState,
         setState: setCurrentState,
+
+        loadScene: async (sceneId: string) => {
+          setIsLoading(true);
+          setLoadProgress(0);
+
+          setName("");
+          setDescription("");
+          setMetadata({});
+
+          setItems([]);
+          setTransitionGroups([]);
+          setTransitions([]);
+          setCamera(null);
+          setBackgroundColor(null);
+
+          setSummaryImage(null);
+
+          fetchData(sceneId, apikey, isPreview);
+        },
+
         dom,
         setDom,
         error,

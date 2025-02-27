@@ -5,6 +5,8 @@ import { mapMetadataToRecord } from "../../utils/helper";
 import ArrowControls from "../ArrowControls";
 import AutomodeControls from "../AutomodeControls";
 import LoadingIndicator from "../LoadingIndicator";
+import { LinkedScene } from "@reflct/api";
+import LinkedSceneControls from "../LinkedSceneControls/LinkedSceneControls";
 
 export type UIChild = (state: {
   index: number;
@@ -12,6 +14,8 @@ export type UIChild = (state: {
   currentViewGroup: ViewMetadata;
   global: ViewMetadata & {
     numberOfViews: number;
+    summaryImage: string | null;
+    linkedScenes: LinkedScene[];
   };
   automode: boolean;
   setAutomode: (automode: boolean) => void;
@@ -19,6 +23,7 @@ export type UIChild = (state: {
   loadProgress: number;
   nextView: () => void;
   prevView: () => void;
+  loadScene: (sceneId: string) => Promise<void>;
 }) => React.ReactNode;
 
 type Props = {
@@ -38,6 +43,9 @@ const UI: React.FC<Props> = ({ ui }) => {
     metadata,
     transitions,
     transitionGroups,
+    linkedScenes,
+    summaryImage,
+    loadScene,
   } = useCanvasContext();
 
   if (ui) {
@@ -71,6 +79,8 @@ const UI: React.FC<Props> = ({ ui }) => {
         description: description ?? "",
         metadata: mapMetadataToRecord(metadata ?? {}),
         numberOfViews: transitions.length,
+        linkedScenes,
+        summaryImage,
       },
       automode,
       setAutomode,
@@ -78,6 +88,7 @@ const UI: React.FC<Props> = ({ ui }) => {
       loadProgress,
       nextView,
       prevView,
+      loadScene,
     });
   }
 
@@ -86,6 +97,7 @@ const UI: React.FC<Props> = ({ ui }) => {
       <AutomodeControls />
       <ArrowControls />
       <LoadingIndicator />
+      <LinkedSceneControls />
     </>
   );
 };

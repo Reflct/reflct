@@ -98,11 +98,21 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
         control.normalizeRotations();
 
         control.maxAzimuthAngle =
-          control.azimuthAngle + targetItem.maxAzimuthAngle;
+          targetItem.maxAzimuthAngle === null
+            ? Number.POSITIVE_INFINITY
+            : control.azimuthAngle + targetItem.maxAzimuthAngle;
         control.minAzimuthAngle =
-          control.azimuthAngle - targetItem.minAzimuthAngle;
-        control.maxPolarAngle = control.polarAngle + targetItem.maxPolarAngle;
-        control.minPolarAngle = control.polarAngle - targetItem.minPolarAngle;
+          targetItem.minAzimuthAngle === null
+            ? Number.NEGATIVE_INFINITY
+            : control.azimuthAngle - targetItem.minAzimuthAngle;
+        control.maxPolarAngle =
+          targetItem.maxPolarAngle === null
+            ? Number.POSITIVE_INFINITY
+            : control.polarAngle + targetItem.maxPolarAngle;
+        control.minPolarAngle =
+          targetItem.minPolarAngle === null
+            ? Number.NEGATIVE_INFINITY
+            : control.polarAngle - targetItem.minPolarAngle;
 
         control.saveState();
 
@@ -169,13 +179,21 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
             control.normalizeRotations();
 
             control.maxAzimuthAngle =
-              control.azimuthAngle + targetItem.maxAzimuthAngle;
+              targetItem.maxAzimuthAngle === null
+                ? Number.POSITIVE_INFINITY
+                : control.azimuthAngle + targetItem.maxAzimuthAngle;
             control.minAzimuthAngle =
-              control.azimuthAngle - targetItem.minAzimuthAngle;
+              targetItem.minAzimuthAngle === null
+                ? Number.NEGATIVE_INFINITY
+                : control.azimuthAngle - targetItem.minAzimuthAngle;
             control.maxPolarAngle =
-              control.polarAngle + targetItem.maxPolarAngle;
+              targetItem.maxPolarAngle === null
+                ? Number.POSITIVE_INFINITY
+                : control.polarAngle + targetItem.maxPolarAngle;
             control.minPolarAngle =
-              control.polarAngle - targetItem.minPolarAngle;
+              targetItem.minPolarAngle === null
+                ? Number.NEGATIVE_INFINITY
+                : control.polarAngle - targetItem.minPolarAngle;
 
             control.saveState();
 
@@ -285,13 +303,21 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
         control.normalizeRotations();
 
         control.maxAzimuthAngle =
-          control.azimuthAngle + currentTransition.item.maxAzimuthAngle;
+          currentTransition.item.maxAzimuthAngle === null
+            ? Number.POSITIVE_INFINITY
+            : control.azimuthAngle + currentTransition.item.maxAzimuthAngle;
         control.minAzimuthAngle =
-          control.azimuthAngle - currentTransition.item.minAzimuthAngle;
+          currentTransition.item.minAzimuthAngle === null
+            ? Number.NEGATIVE_INFINITY
+            : control.azimuthAngle - currentTransition.item.minAzimuthAngle;
         control.maxPolarAngle =
-          control.polarAngle + currentTransition.item.maxPolarAngle;
+          currentTransition.item.maxPolarAngle === null
+            ? Number.POSITIVE_INFINITY
+            : control.polarAngle + currentTransition.item.maxPolarAngle;
         control.minPolarAngle =
-          control.polarAngle - currentTransition.item.minPolarAngle;
+          currentTransition.item.minPolarAngle === null
+            ? Number.NEGATIVE_INFINITY
+            : control.polarAngle - currentTransition.item.minPolarAngle;
 
         control.saveState();
 

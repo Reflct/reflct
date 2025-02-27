@@ -55,10 +55,10 @@ const perspectiveCameraDataSchema = cameraDataSchema.extend({
   aspect: z.number(),
   near: z.number(),
   far: z.number(),
-  maxAzimuthAngle: z.number(),
-  minAzimuthAngle: z.number(),
-  maxPolarAngle: z.number(),
-  minPolarAngle: z.number(),
+  maxAzimuthAngle: z.union([z.number(), z.null()]),
+  minAzimuthAngle: z.union([z.number(), z.null()]),
+  maxPolarAngle: z.union([z.number(), z.null()]),
+  minPolarAngle: z.union([z.number(), z.null()]),
 });
 
 export type PerspectiveCameraData = z.infer<typeof perspectiveCameraDataSchema>;
@@ -113,6 +113,12 @@ export const sceneDataSchema = z.object({
   transitionGroups: z.array(transitionGroupSchema),
 });
 
+export const linkedSceneSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+});
+export type LinkedScene = z.infer<typeof linkedSceneSchema>;
+
 export type SceneDataDto = z.infer<typeof sceneDataSchema>;
 
 export const sceneSchema = z.object({
@@ -128,6 +134,8 @@ export const sceneSchema = z.object({
   createdAt: isoDateSchema,
   updatedAt: isoDateSchema,
   publishedAt: isoDateSchema.optional(),
+  summaryImage: z.string().optional(),
+  linkedScenes: z.array(linkedSceneSchema),
 });
 
 export type SceneDto = z.infer<typeof sceneSchema>;

@@ -101,6 +101,8 @@ const Page = () => {
       description?: string,
       metadata?: Record<string, string>,
       numberOfViews: number,
+      summaryImage: string | null,
+      linkedScenes: LinkedScene[],
     },
     key: string
   ) => {
@@ -179,6 +181,9 @@ If you wish to customise the UIs of the viewer component, you can do those by gi
     loadProgress,
     nextView,
     prevView,
+    summaryImage,
+    linkedScenes,
+    loadScene,
   }) => {
     return <div>Controls {/* what ever you want to render */}</div>;
   }}
@@ -197,6 +202,9 @@ If you wish to customise the UIs of the viewer component, you can do those by gi
 | loadProgress     | number                                                                                             | The progress of the scene loading       |
 | nextView         | function (() => void)                                                                              | The function to go to the next view     |
 | prevView         | function (() => void)                                                                              | The function to go to the previous view |
+| summaryImage     | string or null                                                                                     | The summary image of the scene          |
+| linkedScenes     | { id: string; name: string; }[]                                                                    | The linked scenes of the scene          |
+| loadScene        | function (sceneId: string) => Promise<void>                                                        | The function to load the scene          |
 
 ## CORS issues and SharedArrayBuffer
 

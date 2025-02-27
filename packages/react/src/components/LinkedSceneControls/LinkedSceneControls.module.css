@@ -1,0 +1,87 @@
+.reflct-linked-scenes {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.reflct-linked-scenes.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.reflct-linked-scenes .select {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 4px 4px 8px;
+  gap: 4px;
+  color: #000000;
+  background-color: #ffffff;
+  border-radius: 8px;
+  transition: background-color 0.1s ease-in-out;
+  border: 0px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.reflct-linked-scenes .select:hover {
+  background-color: #ebebeb;
+  color: #000000;
+}
+
+.reflct-linked-scenes .select .chevron {
+  transform: rotate(0deg);
+}
+
+.reflct-linked-scenes .select .chevron.rotate {
+  transform: rotate(180deg);
+}
+
+.reflct-linked-scenes .dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 4px;
+  transform: translateY(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease-in-out;
+  z-index: 0;
+  min-width: 80px;
+  width: max-content;
+}
+
+.reflct-linked-scenes .dropdown.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.reflct-linked-scenes .dropdown button {
+  padding: 4px 8px 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  width: max-content;
+  max-width: 280px;
+  min-width: 80px;
+  color: #000000;
+  background-color: #ffffff;
+}
+
+.reflct-linked-scenes .dropdown button:hover {
+  background-color: #ebebeb;
+  color: #000000;
+}
