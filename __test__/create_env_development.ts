@@ -1,9 +1,6 @@
-import { setupNextJs } from "./utils/setup-nextjs.js";
-import { setupVite } from "./utils/setup-vite.js";
-import {
-  getEnvironmentFromTestName,
-  setupTestEnvironment,
-} from "./utils/test-helpers.js";
+import { setupNextJsV14, setupNextJsV15 } from "./utils/setup-nextjs.js";
+import { setupViteV5, setupViteV6 } from "./utils/setup-vite.js";
+import { setupTestEnvironment } from "./utils/test-helpers.js";
 
 const environments = ["development", "staging", "production"] as const;
 type Environment = (typeof environments)[number];
@@ -25,8 +22,10 @@ try {
   console.log("paths:");
   console.log(paths);
 
-  await setupVite(paths);
-  await setupNextJs(paths);
+  await setupViteV5(paths);
+  await setupViteV6(paths);
+  await setupNextJsV14(paths);
+  await setupNextJsV15(paths);
   console.log(`Successfully set up test environment for: ${environment}`);
 } catch (error) {
   console.error("Error setting up test environment:", error);
