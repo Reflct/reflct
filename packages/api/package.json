@@ -34,6 +34,9 @@
   "license": "MIT",
   "devDependencies": {
     "dotenv": "^16.4.7",
-    "esbuild": "0.24.0"
+    "esbuild": "^0.25.0"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
   }
 }

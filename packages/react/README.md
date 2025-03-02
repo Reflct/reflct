@@ -6,16 +6,47 @@ Visit [Reflct.app](https://reflct.app) for more information.
 
 ## Installation
 
+> [!IMPORTANT]
+> Compatibility with React 19
+>
+> Recent releases of React 19 had compatibility issues with our dependencies.
+> So we've moved those dependencies to the peer dependencies to resolve the issues.
+> Make sure to install correct versions of peer dependencies to use this package from now on.
+
 To install the package, run:
 
 ```bash
+# Install peer dependencies
+npm install three@0.168.0 @react-three/fiber @react-three/drei
+
+# Install the package
 npm install @reflct/react
 ```
 
 or if you're using yarn:
 
 ```bash
+# Install peer dependencies
+yarn add three@0.168.0 @react-three/fiber @react-three/drei
+
+# Install the package
 yarn add @reflct/react
+```
+
+### React 18
+
+If you're using React 18, you need to install the following peer dependencies:
+
+- three@0.168.0
+- @react-three/fiber@8
+- @react-three/drei@9
+
+```bash
+# Install peer dependencies
+npm install three@0.168.0 @react-three/fiber@8 @react-three/drei@9
+
+# Install the package
+npm install @reflct/react
 ```
 
 ## Getting Started
