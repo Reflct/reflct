@@ -133,6 +133,7 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
                 title: currentTransition.title,
                 description: currentTransition.description,
                 metadata: mapMetadataToRecord(currentTransition.metadata ?? {}),
+                showTextDetails: currentTransition.showTextDetails,
               },
               {
                 title: currentTransitionGroup?.title ?? "",
@@ -140,12 +141,21 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
                 metadata: mapMetadataToRecord(
                   currentTransitionGroup?.metadata ?? {}
                 ),
+                views:
+                  currentTransitionGroup?.transitions.map((view) => ({
+                    title: view.title,
+                    description: view.description,
+                    metadata: mapMetadataToRecord(view.metadata ?? {}),
+                    showTextDetails: view.showTextDetails,
+                  })) || [],
               },
               {
                 title: dataRef.current.name ?? "",
                 description: dataRef.current.description ?? "",
                 metadata: mapMetadataToRecord(dataRef.current.metadata ?? {}),
                 numberOfViews: transitions.length,
+                summaryImage: dataRef.current.summaryImage ?? null,
+                linkedScenes: dataRef.current.linkedScenes ?? [],
               }
             );
           },
@@ -214,6 +224,7 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
                 title: currentTransition.title,
                 description: currentTransition.description,
                 metadata: mapMetadataToRecord(currentTransition.metadata ?? {}),
+                showTextDetails: currentTransition.showTextDetails,
               },
               {
                 title: currentTransitionGroup?.title ?? "",
@@ -221,12 +232,21 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
                 metadata: mapMetadataToRecord(
                   currentTransitionGroup?.metadata ?? {}
                 ),
+                views:
+                  currentTransitionGroup?.transitions.map((view) => ({
+                    title: view.title,
+                    description: view.description,
+                    metadata: mapMetadataToRecord(view.metadata ?? {}),
+                    showTextDetails: view.showTextDetails,
+                  })) || [],
               },
               {
                 title: dataRef.current.name ?? "",
                 description: dataRef.current.description ?? "",
                 metadata: mapMetadataToRecord(dataRef.current.metadata ?? {}),
                 numberOfViews: transitions.length,
+                summaryImage: dataRef.current.summaryImage ?? null,
+                linkedScenes: dataRef.current.linkedScenes ?? [],
               }
             );
           },

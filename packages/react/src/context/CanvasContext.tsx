@@ -1,6 +1,3 @@
-//@ts-expect-error
-import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
-
 import gsap from "gsap";
 import React, {
   createContext,
@@ -16,15 +13,19 @@ import type {
   SceneDataDto,
   Transition,
 } from "@reflct/api";
-import { ViewMetadata } from "../types/common";
-import { LinkedScene } from "@reflct/api";
+import {
+  CurrentViewMetadata,
+  GlobalMetadata,
+  LinkedScene,
+  ViewGroupMetadata,
+  ViewMetadata,
+} from "../types/common";
 
 type CanvasContextBaseType = {
   id: string;
   apikey: string;
   isPreview?: boolean;
   sharedMemoryForWorkers?: boolean;
-  sceneRevealMode?: "instant" | "gradual";
   state?: number;
 };
 
@@ -32,38 +33,18 @@ export type CanvasContextEventsType = {
   onLoadStart?: () => void;
   onLoadProgressUpdate?: (progress: number) => void;
   onLoadComplete?: (
-    viewGroups: {
-      title?: string;
-      description?: string;
-      metadata?: Record<string, string>;
-      views: ViewMetadata[];
-    }[],
-    global: {
-      title?: string;
-      description?: string;
-      metadata?: Record<string, string>;
-      numberOfViews: number;
-    }
+    viewGroups: ViewGroupMetadata[],
+    global: GlobalMetadata
   ) => void;
   onStateChangeStart?: (
-    targetView: ViewMetadata,
-    targetViewGroup: ViewMetadata,
-    global: {
-      title?: string;
-      description?: string;
-      metadata?: Record<string, string>;
-      numberOfViews: number;
-    }
+    targetView: CurrentViewMetadata,
+    targetViewGroup: ViewGroupMetadata,
+    global: GlobalMetadata
   ) => void;
   onStateChangeComplete?: (
-    currentView: ViewMetadata,
-    currentViewGroup: ViewMetadata,
-    global: {
-      title?: string;
-      description?: string;
-      metadata?: Record<string, string>;
-      numberOfViews: number;
-    }
+    currentView: CurrentViewMetadata,
+    currentViewGroup: ViewGroupMetadata,
+    global: GlobalMetadata
   ) => void;
   onError?: (error: string) => void;
 };
@@ -71,11 +52,10 @@ export type CanvasContextEventsType = {
 type CanvasContextType = CanvasContextBaseType & {
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
-  loadProgress: number;
-  setLoadProgress: (loadProgress: number) => void;
   automode: boolean;
   setAutomode: (automode: boolean) => void;
-
+  loadProgress: number;
+  setLoadProgress: (loadProgress: number) => void;
   name: string | null;
   description: string | null;
   metadata: Record<string, { value: string; updatedAt: string }> | null;
@@ -84,15 +64,15 @@ type CanvasContextType = CanvasContextBaseType & {
   transitionGroups: SceneDataDto["transitionGroups"];
   transitions: Transition[];
   backgroundColor: string | null;
-
   summaryImage: string | null;
   linkedScenes: LinkedScene[];
-  loadScene: (sceneId: string) => Promise<void>;
+
+  loadScene: (id: string) => Promise<void>;
 
   state: number;
   setState: React.Dispatch<React.SetStateAction<number>>;
-  dom: HTMLElement | null;
-  setDom: (dom: HTMLElement | null) => void;
+  dom: HTMLCanvasElement | null;
+  setDom: (dom: HTMLCanvasElement | null) => void;
   error: Error | null;
 
   // events
@@ -106,6 +86,8 @@ type CanvasContextType = CanvasContextBaseType & {
     transitionGroups?: SceneDataDto["transitionGroups"];
     transitions?: Transition[];
     backgroundColor?: string | null;
+    summaryImage?: string | null;
+    linkedScenes?: LinkedScene[];
   }>;
 };
 
@@ -127,16 +109,14 @@ export const CanvasContext = createContext<CanvasContextType>({
   items: [],
   transitionGroups: [],
   transitions: [],
-  backgroundColor: null,
   summaryImage: null,
+  loadScene: async (id: string) => {},
   linkedScenes: [],
-  loadScene: () => Promise.resolve(),
-
+  backgroundColor: null,
   dom: null,
   setDom: () => {},
   error: null,
   sharedMemoryForWorkers: false,
-  sceneRevealMode: GaussianSplats3D.SceneRevealMode,
   eventsRef: { current: {} },
   dataRef: { current: {} },
 });
@@ -152,14 +132,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
   events,
   children,
 }) => {
-  const {
-    id,
-    apikey,
-    state = 0,
-    isPreview,
-    sharedMemoryForWorkers,
-    sceneRevealMode,
-  } = value;
+  const { id, apikey, state = 0, isPreview, sharedMemoryForWorkers } = value;
 
   const eventsRef = useRef<CanvasContextEventsType>(events);
   const dataRef = useRef<{
@@ -171,6 +144,8 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     transitionGroups: SceneDataDto["transitionGroups"];
     transitions: Transition[];
     backgroundColor?: string | null;
+    summaryImage?: string | null;
+    linkedScenes?: LinkedScene[];
   }>({
     name: null,
     description: null,
@@ -180,6 +155,8 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     transitionGroups: [],
     transitions: [],
     backgroundColor: null,
+    summaryImage: null,
+    linkedScenes: [],
   });
 
   const isFetchingRef = useRef(false);
@@ -208,7 +185,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
   const [summaryImage, setSummaryImage] = useState<string | null>(null);
   const [linkedScenes, setLinkedScenes] = useState<LinkedScene[]>([]);
 
-  const [dom, setDom] = useState<HTMLElement | null>(null);
+  const [dom, setDom] = useState<HTMLCanvasElement | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchData = useCallback(
@@ -229,6 +206,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         setName(response.name);
         setDescription(response.description);
         setMetadata(response.metadata ?? {});
+
         setItems(response.data.items);
         setTransitionGroups(response.data.transitionGroups);
         setTransitions(
@@ -291,6 +269,8 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
       transitionGroups,
       transitions,
       backgroundColor,
+      summaryImage,
+      linkedScenes,
     };
   }, [
     name,
@@ -301,7 +281,8 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     transitionGroups,
     transitions,
     backgroundColor,
-    dataRef,
+    summaryImage,
+    linkedScenes,
   ]);
 
   return (
@@ -328,7 +309,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         state: currentState,
         setState: setCurrentState,
 
-        loadScene: async (sceneId: string) => {
+        loadScene: async (id: string) => {
           setIsLoading(true);
           setLoadProgress(0);
 
@@ -342,19 +323,18 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
           setCamera(null);
           setBackgroundColor(null);
 
+          setAutomode(false);
+          setCurrentState(0);
+
           setSummaryImage(null);
 
-          fetchData(sceneId, apikey, isPreview);
+          fetchData(id, apikey, isPreview);
         },
 
         dom,
         setDom,
         error,
         sharedMemoryForWorkers,
-        sceneRevealMode:
-          sceneRevealMode === "instant"
-            ? GaussianSplats3D.SceneRevealMode.Instant
-            : GaussianSplats3D.SceneRevealMode.Gradual,
         eventsRef,
         dataRef,
       }}

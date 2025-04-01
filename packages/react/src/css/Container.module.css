@@ -1,0 +1,10 @@
+.reflct-wrapper {
+  container-name: reflct-container;
+  container-type: inline-size;
+}
+
+@container reflct-container (width < 768px) {
+  .reflct-wrapper .reflct-text-details {
+    display: none;
+  }
+}

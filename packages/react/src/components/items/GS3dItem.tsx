@@ -20,7 +20,6 @@ const GS3dItem: React.FC<Props> = (props) => {
     eventsRef,
     dataRef,
     sharedMemoryForWorkers,
-    sceneRevealMode,
   } = useCanvasContext();
 
   const viewerRef = useRef<any>(null);
@@ -60,7 +59,7 @@ const GS3dItem: React.FC<Props> = (props) => {
       dynamicScene: true,
       // webXRMode: GaussianSplats3D.WebXRMode.None,
       renderMode: GaussianSplats3D.RenderMode.OnChange,
-      sceneRevealMode,
+      sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
       // antialiased: false,
       // focalAdjustment: 1.0,
 
@@ -104,6 +103,7 @@ const GS3dItem: React.FC<Props> = (props) => {
               title: y.title,
               description: y.description,
               metadata: mapMetadataToRecord(y.metadata ?? {}),
+              showTextDetails: y.showTextDetails,
             })),
           })) || [];
 
@@ -112,6 +112,8 @@ const GS3dItem: React.FC<Props> = (props) => {
           description: dataRef.current.description ?? "",
           metadata: mapMetadataToRecord(dataRef.current.metadata ?? {}),
           numberOfViews: dataRef.current.transitions?.length ?? 0,
+          summaryImage: dataRef.current.summaryImage ?? null,
+          linkedScenes: dataRef.current.linkedScenes ?? [],
         });
         setIsLoading(false);
       });
