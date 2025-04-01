@@ -39,15 +39,18 @@ export async function setupTestEnvironment(
   return paths;
 }
 
-export async function startNextJsProject(paths: BuildConfig): Promise<{
+export async function startNextJsProject(
+  paths: BuildConfig,
+  target: string
+): Promise<{
   port: number;
   cleanup: () => void;
 }> {
-  console.log(path.join(paths.envDir, "next-test"));
+  console.log(path.join(paths.envDir, target));
 
   const port = 5172;
   const process = exec(`yarn dev --port ${port}`, {
-    cwd: path.join(paths.envDir, "next-test"),
+    cwd: path.join(paths.envDir, target),
   });
 
   // Wait for the server to start
@@ -63,13 +66,16 @@ export async function startNextJsProject(paths: BuildConfig): Promise<{
   };
 }
 
-export async function startViteProject(paths: BuildConfig): Promise<{
+export async function startViteProject(
+  paths: BuildConfig,
+  target: string
+): Promise<{
   port: number;
   cleanup: () => void;
 }> {
   const port = 5173;
   const process = exec(`yarn dev --port ${port}`, {
-    cwd: path.join(paths.envDir, "vite-test"),
+    cwd: path.join(paths.envDir, target),
   });
 
   // Wait for the server to start
