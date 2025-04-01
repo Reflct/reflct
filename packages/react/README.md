@@ -74,7 +74,6 @@ Viewer component has props for listening to events and customizing the UI.
   apikey={"your-apikey"}
   isPreview={true}
   sharedMemoryForWorkers={false}
-  sceneRevealMode="gradual"
   className={"your-class-name"}
   // events
   onLoadStart={() => {}}
@@ -88,25 +87,53 @@ Viewer component has props for listening to events and customizing the UI.
 
 Here are the basic props for the Viewer component:
 
-| Props                  | Type                   | Description                              |
-| ---------------------- | ---------------------- | ---------------------------------------- |
-| id                     | string                 | Your scene id                            |
-| apikey                 | string                 | Your api key                             |
-| isPreview              | boolean                | Whether to use preview scene             |
-| sceneRevealMode        | "instant" or "gradual" | Set to reveal scene Gradually or Instant |
-| sharedMemoryForWorkers | boolean                | Whether to use shared memory for workers |
-| className              | string                 | class name for the viewer                |
+| Props                  | Type    | Description                              |
+| ---------------------- | ------- | ---------------------------------------- |
+| id                     | string  | Your scene id                            |
+| apikey                 | string  | Your api key                             |
+| isPreview              | boolean | Whether to use preview scene             |
+| sharedMemoryForWorkers | boolean | Whether to use shared memory for workers |
+| className              | string  | class name for the viewer                |
 
 These are the events fired by the Viewer component:
 
-| Events                | Type                                                                                                                                                                                                                                   | Description                        |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| onLoadStart           | () => void                                                                                                                                                                                                                             | Called when the scene is loading.  |
-| onLoadProgressUpdate  | (progress: number) => void                                                                                                                                                                                                             | Called when the scene is loading.  |
-| onLoadComplete        | (viewGroups: { title?: string; description?: string; metadata?: Record<string, string>; views: ViewMetadata[]; }, global: { title?: string; description?: string; metadata?: Record<string, string>; numberOfViews: number; }) => void | Called when the scene is loaded.   |
-| onStateChangeStart    | (targetView: ViewMetadata, targetViewGroup: ViewMetadata, global: { title?: string; description?: string; metadata?: Record<string, string>; numberOfViews: number; }) => void                                                         | Called when the scene is changing. |
-| onStateChangeComplete | (currentView: ViewMetadata, currentViewGroup: ViewMetadata, global: { title?: string; description?: string; metadata?: Record<string, string>; numberOfViews: number; }) => void                                                       | Called when the scene is changed.  |
-| onError               | (error: string) => void                                                                                                                                                                                                                | Called when the scene is error.    |
+| Events                | Type                                                                                                    | Description                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| onLoadStart           | () => void                                                                                              | Called when the scene is loading.  |
+| onLoadProgressUpdate  | (progress: number) => void                                                                              | Called when the scene is loading.  |
+| onLoadComplete        | (viewGroups: ViewGroupMetadata[], global: GlobalMetadata) => void                                       | Called when the scene is loaded.   |
+| onStateChangeStart    | (targetView: CurrentViewMetadata, targetViewGroup: ViewGroupMetadata, global: GlobalMetadata) => void   | Called when the scene is changing. |
+| onStateChangeComplete | (currentView: CurrentViewMetadata, currentViewGroup: ViewGroupMetadata, global: GlobalMetadata) => void | Called when the scene is changed.  |
+| onError               | (error: string) => void                                                                                 | Called when the scene is error.    |
+
+Where `LinkedScene`, `ViewMetadata`, `CurrentViewMetadata`, `ViewGroupMetadata`, and `GlobalMetadata` are defined as follows:
+
+```ts
+export type LinkedScene = {
+  id: string;
+  name: string;
+};
+
+export type ViewMetadata = {
+  title?: string;
+  description?: string;
+  metadata?: Record<string, string>;
+};
+
+export type CurrentViewMetadata = ViewMetadata & {
+  showTextDetails?: boolean;
+};
+
+export type ViewGroupMetadata = ViewMetadata & {
+  views: ViewMetadata[];
+};
+
+export type GlobalMetadata = ViewMetadata & {
+  numberOfViews: number;
+  summaryImage: string | null;
+  linkedScenes: LinkedScene[];
+};
+```
 
 These Events and metadata that are passed in the events could be used to run logics in your application, such as updating the UI or state.
 
@@ -221,21 +248,43 @@ If you wish to customise the UIs of the viewer component, you can do those by gi
 </Viewer>
 ```
 
-| Props            | Type                                                                                               | Description                             |
-| ---------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| currentView      | { title?: string; description?: string; metadata?: Record<string, string> }                        | The current view metadata               |
-| currentViewGroup | { title?: string; description?: string; metadata?: Record<string, string> }                        | The current view group metadata         |
-| global           | { title?: string; description?: string; metadata?: Record<string, string>; numberOfViews: number } | The global metadata                     |
-| index            | number                                                                                             | The current index of the views          |
-| automode         | boolean                                                                                            | Whether the automode is enabled         |
-| setAutomode      | function (automode: boolean)                                                                       | The function to set the automode        |
-| isLoading        | boolean                                                                                            | Whether the scene is loading            |
-| loadProgress     | number                                                                                             | The progress of the scene loading       |
-| nextView         | function (() => void)                                                                              | The function to go to the next view     |
-| prevView         | function (() => void)                                                                              | The function to go to the previous view |
-| summaryImage     | string or null                                                                                     | The summary image of the scene          |
-| linkedScenes     | { id: string; name: string; }[]                                                                    | The linked scenes of the scene          |
-| loadScene        | function (sceneId: string) => Promise<void>                                                        | The function to load the scene          |
+| Props            | Type                                        | Description                             |
+| ---------------- | ------------------------------------------- | --------------------------------------- |
+| currentView      | CurrentViewMetadata                         | The current view metadata               |
+| currentViewGroup | ViewGroupMetadata                           | The current view group metadata         |
+| global           | GlobalMetadata                              | The global metadata                     |
+| index            | number                                      | The current index of the views          |
+| automode         | boolean                                     | Whether the automode is enabled         |
+| setAutomode      | function (automode: boolean)                | The function to set the automode        |
+| isLoading        | boolean                                     | Whether the scene is loading            |
+| loadProgress     | number                                      | The progress of the scene loading       |
+| nextView         | function (() => void)                       | The function to go to the next view     |
+| prevView         | function (() => void)                       | The function to go to the previous view |
+| summaryImage     | string or null                              | The summary image of the scene          |
+| linkedScenes     | { id: string; name: string; }[]             | The linked scenes of the scene          |
+| loadScene        | function (sceneId: string) => Promise<void> | The function to load the scene          |
+
+If you wish to customise the UI of the hitpoints, you can do that by giving the `hitPoint` prop.
+
+```jsx
+<Viewer
+  id={"your-scene-id"}
+  apikey={"your-apikey"}
+  hitPoint={(state: {
+    index: number,
+    isSelected: boolean,
+    inCurrentGroup: boolean,
+    select: () => void,
+  }) => <button onClick={state.select}>Hitpoint</button>}
+/>
+```
+
+| Props          | Type                  | Description                                       |
+| -------------- | --------------------- | ------------------------------------------------- |
+| index          | number                | The index of the hitpoint                         |
+| isSelected     | boolean               | Whether the hitpoint is selected                  |
+| inCurrentGroup | boolean               | Whether the hitpoint is in the current view group |
+| select         | function (() => void) | The function to select the hitpoint               |
 
 ## CORS issues and SharedArrayBuffer
 
