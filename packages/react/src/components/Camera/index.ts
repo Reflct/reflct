@@ -1,1 +1,1 @@
-export { default as PerspectiveCameraItem } from "../Camera/PerspectiveCameraItem";
+export { default as PerspectiveCameraItem } from "./PerspectiveCameraItem";

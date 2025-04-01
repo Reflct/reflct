@@ -1,15 +1,19 @@
+import styles from "./Viewer.module.css";
+import containerStyles from "../../css/Container.module.css";
+
 import { Preload } from "@react-three/drei";
 import React, { useRef } from "react";
 import { CanvasContextProvider } from "../../context";
 import { CanvasContextEventsType } from "../../context/CanvasContext";
+import Background from "../Background";
 import CameraLoader from "../CameraLoader";
 import Canvas from "../Canvas";
 import ErrorHandler from "../ErrorHandler";
+import HitPoints from "../HitPoints";
+import { HitPoint } from "../HitPoints/HitPoints";
 import ObjectLoader from "../ObjectLoader";
 import UI from "../UI";
 import { UIChild } from "../UI/UI";
-import styles from "./Viewer.module.css";
-import Background from "../Background";
 
 type Props = {
   id: string;
@@ -17,9 +21,9 @@ type Props = {
   isPreview?: boolean;
   sharedMemoryForWorkers?: boolean;
   className?: string;
-  sceneRevealMode?: "instant" | "gradual";
 
   // renders
+  hitPoint?: HitPoint;
   children?: UIChild;
 } & CanvasContextEventsType;
 
@@ -28,7 +32,6 @@ const Viewer: React.FC<Props> = ({
   apikey,
   isPreview = false,
   sharedMemoryForWorkers = true,
-  sceneRevealMode = "gradual",
   className,
 
   // events
@@ -40,6 +43,7 @@ const Viewer: React.FC<Props> = ({
   onError,
 
   // renders
+  hitPoint,
   children,
 }) => {
   if (!id || !apikey) {
@@ -50,7 +54,7 @@ const Viewer: React.FC<Props> = ({
 
   return (
     <CanvasContextProvider
-      value={{ id, apikey, isPreview, sharedMemoryForWorkers, sceneRevealMode }}
+      value={{ id, apikey, isPreview, sharedMemoryForWorkers }}
       events={{
         onLoadStart,
         onLoadProgressUpdate,
@@ -60,12 +64,16 @@ const Viewer: React.FC<Props> = ({
         onError,
       }}
     >
-      <div className={className || `${styles["mantel-wrapper"]}`} ref={ref}>
+      <div
+        className={`${containerStyles["reflct-wrapper"]} ${className || styles["wrapper"]}`}
+        ref={ref}
+      >
         <Background />
         <Canvas>
           <CameraLoader />
           <ObjectLoader />
           <Preload all />
+          <HitPoints hitPoint={hitPoint} />
         </Canvas>
         <UI ui={children} />
         <ErrorHandler />

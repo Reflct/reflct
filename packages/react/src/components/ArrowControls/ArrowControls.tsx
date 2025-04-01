@@ -3,61 +3,93 @@ import React from "react";
 import { useCanvasContext } from "../../context";
 import styles from "./ArrowControls.module.css";
 
-type Props = {
-  icons?: {
-    left?: React.ReactNode;
-    right?: React.ReactNode;
-  };
-};
-
-const ArrowControls: React.FC<Props> = ({ icons }) => {
-  const { automode, state, setState } = useCanvasContext();
+const ArrowControls: React.FC = () => {
+  const { automode, state, setState, setAutomode } = useCanvasContext();
 
   return (
-    <div
-      className={`${styles["reflct-controls"]} ${
-        automode ? styles["inactive"] : ""
-      }`}
-    >
-      <button className={styles["button"]} onClick={() => setState(state - 1)}>
-        {icons?.left ? (
-          icons.left
-        ) : (
+    <div className={styles["reflct-controls"]}>
+      <button
+        className={styles["button"]}
+        onClick={() => {
+          if (automode) return;
+
+          setState(state - 1);
+        }}
+      >
+        <svg
+          width="21"
+          height="21"
+          viewBox="0 0 21 21"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12.166 15.0947L7.16602 10.0947L12.166 5.09473"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          ></path>
+        </svg>
+      </button>
+      <button
+        className={`${styles["button"]} ${styles["big"]}`}
+        onClick={() => setAutomode(!automode)}
+      >
+        {automode ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
+            fill="currentColor"
+            stroke="none"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="m12 19-7-7 7-7" />
-            <path d="M19 12H5" />
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            stroke="none"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="6 3 20 12 6 21 6 3"></polygon>
           </svg>
         )}
       </button>
-      <button className={styles["button"]} onClick={() => setState(state + 1)}>
-        {icons?.right ? (
-          icons.right
-        ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
+      <button
+        className={styles["button"]}
+        onClick={() => {
+          if (automode) return;
+
+          setState(state + 1);
+        }}
+      >
+        <svg
+          width="21"
+          height="21"
+          viewBox="0 0 21 21"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M8.83398 15.0947L13.834 10.0947L8.83398 5.09473"
+            stroke="white"
+            strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        )}
+          ></path>
+        </svg>
       </button>
     </div>
   );

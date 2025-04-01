@@ -17,32 +17,31 @@
 }
 
 .reflct-linked-scenes .select {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 4px 4px 4px 8px;
-  gap: 4px;
-  color: #000000;
-  background-color: #ffffff;
-  border-radius: 8px;
+  height: 48px;
+  padding: 0px 12px 0px 16px;
+
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+
+  backdrop-filter: blur(50px);
+
   transition: background-color 0.1s ease-in-out;
-  border: 0px;
   cursor: pointer;
+
   z-index: 1;
 }
 
+.reflct-linked-scenes .select.active {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .reflct-linked-scenes .select:hover {
-  background-color: #ebebeb;
-  color: #000000;
-}
-
-.reflct-linked-scenes .select .chevron {
-  transform: rotate(0deg);
-}
-
-.reflct-linked-scenes .select .chevron.rotate {
-  transform: rotate(180deg);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .reflct-linked-scenes .dropdown {
@@ -51,17 +50,26 @@
   right: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 4px;
+
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+
+  padding: 2px 4px;
+
   transform: translateY(4px);
+
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.1s ease-in-out;
-  z-index: 0;
-  min-width: 80px;
+
+  min-width: 207px;
   width: max-content;
+
+  backdrop-filter: blur(50px);
+  z-index: 0;
+
+  transition: opacity 0.1s ease-in-out;
+  overflow: hidden;
 }
 
 .reflct-linked-scenes .dropdown.show {
@@ -69,19 +77,28 @@
   pointer-events: auto;
 }
 
+.reflct-linked-scenes .dropdown button:first-child {
+  border-top: 0px;
+}
+
 .reflct-linked-scenes .dropdown button {
-  padding: 4px 8px 4px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: left;
-  width: max-content;
+  width: 100%;
+  min-width: 175px;
   max-width: 280px;
-  min-width: 80px;
-  color: #000000;
-  background-color: #ffffff;
+  height: 48px;
+
+  padding: 0px 16px;
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  text-align: left;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.35);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .reflct-linked-scenes .dropdown button:hover {
-  background-color: #ebebeb;
-  color: #000000;
+  background-color: rgba(0, 0, 0, 0.08);
 }

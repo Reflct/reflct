@@ -1,0 +1,55 @@
+.hit-point {
+  position: absolute;
+  border-radius: 9999px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  cursor: pointer;
+
+  width: 20px;
+  height: 20px;
+
+  background: transparent;
+  border: none;
+
+  transition: width 0.2s ease-in-out, height 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
+}
+
+.hit-point.selected {
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.hit-point .indicator {
+  position: absolute;
+  border-radius: 9999px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #3392ff;
+
+  width: 18px;
+  height: 18px;
+
+  transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+}
+
+.hit-point.selected .indicator {
+  width: 38px;
+  height: 38px;
+}
+
+.hit-point .center {
+  position: absolute;
+  background-color: #3392ff;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

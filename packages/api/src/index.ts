@@ -11,5 +11,4 @@ export {
   GS3dData,
   SplatData,
   ObjectData,
-  LinkedScene,
 } from "./api/models";

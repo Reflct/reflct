@@ -1,22 +1,21 @@
 import React from "react";
 import { useCanvasContext } from "../../context";
-import { ViewMetadata } from "../../types/common";
+import {
+  CurrentViewMetadata,
+  GlobalMetadata,
+  ViewGroupMetadata,
+} from "../../types/common";
 import { mapMetadataToRecord } from "../../utils/helper";
 import ArrowControls from "../ArrowControls";
-import AutomodeControls from "../AutomodeControls";
-import LoadingIndicator from "../LoadingIndicator";
-import { LinkedScene } from "@reflct/api";
 import LinkedSceneControls from "../LinkedSceneControls/LinkedSceneControls";
+import LoadingIndicator from "../LoadingIndicator";
+import TextDetails from "../TextDetails";
 
 export type UIChild = (state: {
   index: number;
-  currentView: ViewMetadata;
-  currentViewGroup: ViewMetadata;
-  global: ViewMetadata & {
-    numberOfViews: number;
-    summaryImage: string | null;
-    linkedScenes: LinkedScene[];
-  };
+  currentView: CurrentViewMetadata;
+  currentViewGroup: ViewGroupMetadata;
+  global: GlobalMetadata;
   automode: boolean;
   setAutomode: (automode: boolean) => void;
   isLoading: boolean;
@@ -55,10 +54,18 @@ const UI: React.FC<Props> = ({ ui }) => {
     );
 
     const nextView = () => {
+      if (isLoading || automode) {
+        return;
+      }
+
       setState((state + 1) % transitions.length);
     };
 
     const prevView = () => {
+      if (isLoading || automode) {
+        return;
+      }
+
       setState((state - 1) % transitions.length);
     };
 
@@ -68,19 +75,27 @@ const UI: React.FC<Props> = ({ ui }) => {
         title: currentTransition?.title,
         description: currentTransition?.description,
         metadata: mapMetadataToRecord(currentTransition?.metadata ?? {}),
+        showTextDetails: currentTransition?.showTextDetails,
       },
       currentViewGroup: {
         title: currentTransitionGroup?.title,
         description: currentTransitionGroup?.description,
         metadata: mapMetadataToRecord(currentTransitionGroup?.metadata ?? {}),
+        views:
+          currentTransitionGroup?.transitions.map((view) => ({
+            title: view.title,
+            description: view.description,
+            metadata: mapMetadataToRecord(view.metadata ?? {}),
+            showTextDetails: view.showTextDetails,
+          })) || [],
       },
       global: {
         title: name ?? "",
         description: description ?? "",
         metadata: mapMetadataToRecord(metadata ?? {}),
         numberOfViews: transitions.length,
-        linkedScenes,
         summaryImage,
+        linkedScenes,
       },
       automode,
       setAutomode,
@@ -94,10 +109,10 @@ const UI: React.FC<Props> = ({ ui }) => {
 
   return (
     <>
-      <AutomodeControls />
       <ArrowControls />
       <LoadingIndicator />
       <LinkedSceneControls />
+      <TextDetails />
     </>
   );
 };

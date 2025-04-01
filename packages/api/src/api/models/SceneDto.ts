@@ -90,6 +90,8 @@ export const transitionSchema = z.object({
   type: z.enum(["point"]),
   title: z.string(),
   description: z.string().optional(),
+  showHitPoint: z.boolean().optional(),
+  showTextDetails: z.boolean().optional(),
   metadata: sceneMetadataSchema.optional(),
   duration: z.number(),
   easing: z.string(),
