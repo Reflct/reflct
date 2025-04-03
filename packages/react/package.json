@@ -1,6 +1,6 @@
 {
   "name": "@reflct/react",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.1",
   "description": "",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "0.4.7",
-    "@reflct/api": "^1.0.0-alpha.0",
+    "@reflct/api": "^1.0.0-alpha.1",
     "gsap": "^3.12.5"
   },
   "gitHead": "7e01b93c07d014b5facbbad00df0c673c0642e5e"
