@@ -1,6 +1,6 @@
 {
   "name": "@reflct/react",
-  "version": "0.0.7",
+  "version": "1.0.0-alpha.0",
   "description": "",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -59,14 +59,14 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
     "@react-three/drei": "^9.92.7 || ^10.0.3",
     "@react-three/fiber": "^8.15.12 || ^9.0.4",
+    "react": "^18 || ^19",
     "three": ">=0.160.0"
   },
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "0.4.7",
-    "@reflct/api": "^0.0.7",
+    "@reflct/api": "^1.0.0-alpha.0",
     "gsap": "^3.12.5"
   },
   "gitHead": "7e01b93c07d014b5facbbad00df0c673c0642e5e"
