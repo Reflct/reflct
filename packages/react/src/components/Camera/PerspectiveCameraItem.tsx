@@ -1,11 +1,14 @@
 import { CameraControls, PerspectiveCamera } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
+import type { PerspectiveCameraData } from "@reflct/api";
 import gsap from "gsap";
+import { CustomEase } from "gsap/CustomEase";
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
-import type { PerspectiveCameraData } from "@reflct/api";
 import { useCanvasContext } from "../../context";
 import { mapMetadataToRecord } from "../../utils/helper";
+
+gsap.registerPlugin(CustomEase);
 
 type Props = PerspectiveCameraData;
 
@@ -21,12 +24,15 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
     transitionGroups,
     eventsRef,
     dataRef,
+    transitionSpeedMultiplier,
+    automodeTransitionSpeedMultiplier,
   } = useCanvasContext();
   const { invalidate, camera, gl } = useThree();
 
   const ref = useRef<THREE.PerspectiveCamera>(null);
   const controlRef = useRef<CameraControls>(null);
   const loadedRef = useRef(false);
+  const isTransitioningRef = useRef(false);
 
   const vectorState = useRef({
     positionVector: new THREE.Vector3(position[0], position[1], position[2]),
@@ -35,8 +41,60 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
   });
 
   useEffect(() => {
-    vectorState.current.speedMultiplier = automode ? 0.5 : 1;
-  }, [automode]);
+    vectorState.current.speedMultiplier = automode
+      ? automodeTransitionSpeedMultiplier
+      : transitionSpeedMultiplier;
+  }, [automode, transitionSpeedMultiplier, automodeTransitionSpeedMultiplier]);
+
+  useEffect(() => {
+    const position = new THREE.Vector3();
+    const lookat = new THREE.Vector3();
+
+    controlRef.current?.getPosition(position);
+    controlRef.current?.getTarget(lookat);
+
+    dataRef.current.cameraInfo = {
+      getPosition: () => {
+        controlRef.current?.getPosition(position);
+
+        return [position.x, position.y, position.z];
+      },
+      getLookat: () => {
+        controlRef.current?.getTarget(lookat);
+
+        return [lookat.x, lookat.y, lookat.z];
+      },
+      getZoom: () => {
+        return ref.current?.zoom ?? 1;
+      },
+      setPosition: (position: [number, number, number]) => {
+        if (isTransitioningRef.current) {
+          return;
+        }
+
+        controlRef.current?.setPosition(
+          position[0],
+          position[1],
+          position[2],
+          false
+        );
+      },
+      setLookat: (lookat: [number, number, number]) => {
+        if (isTransitioningRef.current) {
+          return;
+        }
+
+        controlRef.current?.setTarget(lookat[0], lookat[1], lookat[2], false);
+      },
+      setZoom: (zoom: number) => {
+        if (isTransitioningRef.current) {
+          return;
+        }
+
+        controlRef.current?.zoomTo(zoom, false);
+      },
+    };
+  }, []);
 
   useEffect(() => {
     const camera = ref.current;
@@ -128,6 +186,8 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
                 group.transitions.find((x) => x.id === currentTransition.id)
               );
 
+            isTransitioningRef.current = true;
+
             eventsRef.current.onStateChangeStart?.(
               {
                 title: currentTransition.title,
@@ -156,7 +216,8 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
                 numberOfViews: transitions.length,
                 summaryImage: dataRef.current.summaryImage ?? null,
                 linkedScenes: dataRef.current.linkedScenes ?? [],
-              }
+              },
+              dataRef.current.cameraInfo ?? null
             );
           },
           onUpdate: () => {
@@ -214,6 +275,8 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
               control.connect(dom);
             }
 
+            isTransitioningRef.current = false;
+
             const currentTransitionGroup =
               dataRef.current.transitionGroups?.find((group) =>
                 group.transitions.find((x) => x.id === currentTransition.id)
@@ -247,7 +310,8 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
                 numberOfViews: transitions.length,
                 summaryImage: dataRef.current.summaryImage ?? null,
                 linkedScenes: dataRef.current.linkedScenes ?? [],
-              }
+              },
+              dataRef.current.cameraInfo ?? null
             );
           },
         })
@@ -257,7 +321,10 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
             progress: 1,
             duration:
               currentTransition.duration / vectorState.current.speedMultiplier,
-            ease: currentTransition.easing,
+            ease: CustomEase.create(
+              "custom",
+              currentTransition.easing?.replace(/\s/g, "")
+            ),
           },
           0
         )
@@ -270,7 +337,10 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
             far: targetItem.far,
             // zoom: targetItem.zoom,
             duration: currentTransition.duration,
-            ease: currentTransition.easing,
+            ease: CustomEase.create(
+              "custom",
+              currentTransition.easing?.replace(/\s/g, "")
+            ),
           },
           0
         );

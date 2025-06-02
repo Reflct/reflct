@@ -20,6 +20,7 @@ const GS3dItem: React.FC<Props> = (props) => {
     eventsRef,
     dataRef,
     sharedMemoryForWorkers,
+    onNewScene,
   } = useCanvasContext();
 
   const viewerRef = useRef<any>(null);
@@ -107,14 +108,23 @@ const GS3dItem: React.FC<Props> = (props) => {
             })),
           })) || [];
 
-        eventsRef.current.onLoadComplete?.(transitionGroup, {
-          title: dataRef.current.name ?? "",
-          description: dataRef.current.description ?? "",
-          metadata: mapMetadataToRecord(dataRef.current.metadata ?? {}),
-          numberOfViews: dataRef.current.transitions?.length ?? 0,
-          summaryImage: dataRef.current.summaryImage ?? null,
-          linkedScenes: dataRef.current.linkedScenes ?? [],
+        eventsRef.current.onLoadComplete?.(
+          transitionGroup,
+          {
+            title: dataRef.current.name ?? "",
+            description: dataRef.current.description ?? "",
+            metadata: mapMetadataToRecord(dataRef.current.metadata ?? {}),
+            numberOfViews: dataRef.current.transitions?.length ?? 0,
+            summaryImage: dataRef.current.summaryImage ?? null,
+            linkedScenes: dataRef.current.linkedScenes ?? [],
+          },
+          dataRef.current.cameraInfo ?? null
+        );
+
+        onNewScene.push(() => {
+          viewerRef.current.removeSplatScene(0);
         });
+
         setIsLoading(false);
       });
   }, [scene, gl, camera, src, position, rotation, scale, dataRef]);

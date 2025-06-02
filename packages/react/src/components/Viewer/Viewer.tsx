@@ -15,12 +15,16 @@ import ObjectLoader from "../ObjectLoader";
 import UI from "../UI";
 import { UIChild } from "../UI/UI";
 
-type Props = {
+export type Props = {
   id: string;
   apikey: string;
   isPreview?: boolean;
   sharedMemoryForWorkers?: boolean;
   className?: string;
+
+  // camera
+  transitionSpeedMultiplier?: number;
+  automodeTransitionSpeedMultiplier?: number;
 
   // renders
   hitPoint?: HitPoint;
@@ -33,6 +37,9 @@ const Viewer: React.FC<Props> = ({
   isPreview = false,
   sharedMemoryForWorkers = true,
   className,
+
+  transitionSpeedMultiplier = 1,
+  automodeTransitionSpeedMultiplier = 0.5,
 
   // events
   onLoadStart,
@@ -54,7 +61,14 @@ const Viewer: React.FC<Props> = ({
 
   return (
     <CanvasContextProvider
-      value={{ id, apikey, isPreview, sharedMemoryForWorkers }}
+      value={{
+        id,
+        apikey,
+        isPreview,
+        sharedMemoryForWorkers,
+        transitionSpeedMultiplier,
+        automodeTransitionSpeedMultiplier,
+      }}
       events={{
         onLoadStart,
         onLoadProgressUpdate,
