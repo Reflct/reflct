@@ -1,3 +1,9 @@
+import type {
+  PerspectiveCameraData,
+  SceneDataDto,
+  Transition,
+} from "@reflct/api";
+import { client } from "@reflct/api";
 import gsap from "gsap";
 import React, {
   createContext,
@@ -7,18 +13,12 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { client } from "@reflct/api";
-import type {
-  PerspectiveCameraData,
-  SceneDataDto,
-  Transition,
-} from "@reflct/api";
 import {
+  CameraInfo,
   CurrentViewMetadata,
   GlobalMetadata,
   LinkedScene,
   ViewGroupMetadata,
-  ViewMetadata,
 } from "../types/common";
 
 type CanvasContextBaseType = {
@@ -27,6 +27,8 @@ type CanvasContextBaseType = {
   isPreview?: boolean;
   sharedMemoryForWorkers?: boolean;
   state?: number;
+  transitionSpeedMultiplier: number;
+  automodeTransitionSpeedMultiplier: number;
 };
 
 export type CanvasContextEventsType = {
@@ -34,17 +36,20 @@ export type CanvasContextEventsType = {
   onLoadProgressUpdate?: (progress: number) => void;
   onLoadComplete?: (
     viewGroups: ViewGroupMetadata[],
-    global: GlobalMetadata
+    global: GlobalMetadata,
+    camera: CameraInfo | null
   ) => void;
   onStateChangeStart?: (
     targetView: CurrentViewMetadata,
     targetViewGroup: ViewGroupMetadata,
-    global: GlobalMetadata
+    global: GlobalMetadata,
+    camera: CameraInfo | null
   ) => void;
   onStateChangeComplete?: (
     currentView: CurrentViewMetadata,
     currentViewGroup: ViewGroupMetadata,
-    global: GlobalMetadata
+    global: GlobalMetadata,
+    camera: CameraInfo | null
   ) => void;
   onError?: (error: string) => void;
 };
@@ -68,6 +73,7 @@ type CanvasContextType = CanvasContextBaseType & {
   linkedScenes: LinkedScene[];
 
   loadScene: (id: string) => Promise<void>;
+  onNewScene: (() => void)[];
 
   state: number;
   setState: React.Dispatch<React.SetStateAction<number>>;
@@ -88,6 +94,7 @@ type CanvasContextType = CanvasContextBaseType & {
     backgroundColor?: string | null;
     summaryImage?: string | null;
     linkedScenes?: LinkedScene[];
+    cameraInfo?: CameraInfo | null;
   }>;
 };
 
@@ -119,6 +126,9 @@ export const CanvasContext = createContext<CanvasContextType>({
   sharedMemoryForWorkers: false,
   eventsRef: { current: {} },
   dataRef: { current: {} },
+  onNewScene: [],
+  transitionSpeedMultiplier: 1,
+  automodeTransitionSpeedMultiplier: 0.5,
 });
 
 type CanvasContextProviderProps = {
@@ -146,6 +156,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     backgroundColor?: string | null;
     summaryImage?: string | null;
     linkedScenes?: LinkedScene[];
+    cameraInfo: CameraInfo | null;
   }>({
     name: null,
     description: null,
@@ -157,9 +168,12 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     backgroundColor: null,
     summaryImage: null,
     linkedScenes: [],
+    cameraInfo: null,
   });
+  const onNewSceneRef = useRef<(() => void)[]>([]);
 
   const isFetchingRef = useRef(false);
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
 
@@ -271,6 +285,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
       backgroundColor,
       summaryImage,
       linkedScenes,
+      cameraInfo: dataRef.current.cameraInfo,
     };
   }, [
     name,
@@ -310,6 +325,9 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         setState: setCurrentState,
 
         loadScene: async (id: string) => {
+          onNewSceneRef.current.forEach((fn) => fn());
+          onNewSceneRef.current = [];
+
           setIsLoading(true);
           setLoadProgress(0);
 
@@ -337,6 +355,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         sharedMemoryForWorkers,
         eventsRef,
         dataRef,
+        onNewScene: onNewSceneRef.current,
       }}
     >
       {children}
