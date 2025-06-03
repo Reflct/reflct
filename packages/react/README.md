@@ -75,6 +75,8 @@ Viewer component has props for listening to events and customizing the UI.
   isPreview={true}
   sharedMemoryForWorkers={false}
   className={"your-class-name"}
+  transitionSpeedMultiplier={1.0}
+  automodeTransitionSpeedMultiplier={0.5}
   // events
   onLoadStart={() => {}}
   onLoadProgressUpdate={(progress: number) => {}}
@@ -87,26 +89,28 @@ Viewer component has props for listening to events and customizing the UI.
 
 Here are the basic props for the Viewer component:
 
-| Props                  | Type    | Description                              |
-| ---------------------- | ------- | ---------------------------------------- |
-| id                     | string  | Your scene id                            |
-| apikey                 | string  | Your api key                             |
-| isPreview              | boolean | Whether to use preview scene             |
-| sharedMemoryForWorkers | boolean | Whether to use shared memory for workers |
-| className              | string  | class name for the viewer                |
+| Props                             | Type    | Description                                                        |
+| --------------------------------- | ------- | ------------------------------------------------------------------ |
+| id                                | string  | Your scene id                                                      |
+| apikey                            | string  | Your api key                                                       |
+| isPreview                         | boolean | Whether to use preview scene                                       |
+| sharedMemoryForWorkers            | boolean | Whether to use shared memory for workers                           |
+| className                         | string  | class name for the viewer                                          |
+| transitionSpeedMultiplier         | number  | Speed multiplier for camera transitions (default: 1)               |
+| automodeTransitionSpeedMultiplier | number  | Speed multiplier for camera transitions in automode (default: 0.5) |
 
 These are the events fired by the Viewer component:
 
-| Events                | Type                                                                                                    | Description                        |
-| --------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| onLoadStart           | () => void                                                                                              | Called when the scene is loading.  |
-| onLoadProgressUpdate  | (progress: number) => void                                                                              | Called when the scene is loading.  |
-| onLoadComplete        | (viewGroups: ViewGroupMetadata[], global: GlobalMetadata) => void                                       | Called when the scene is loaded.   |
-| onStateChangeStart    | (targetView: CurrentViewMetadata, targetViewGroup: ViewGroupMetadata, global: GlobalMetadata) => void   | Called when the scene is changing. |
-| onStateChangeComplete | (currentView: CurrentViewMetadata, currentViewGroup: ViewGroupMetadata, global: GlobalMetadata) => void | Called when the scene is changed.  |
-| onError               | (error: string) => void                                                                                 | Called when the scene is error.    |
+| Events                | Type                                                                                                                                | Description                        |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| onLoadStart           | () => void                                                                                                                          | Called when the scene is loading.  |
+| onLoadProgressUpdate  | (progress: number) => void                                                                                                          | Called when the scene is loading.  |
+| onLoadComplete        | (viewGroups: ViewGroupMetadata[], global: GlobalMetadata, camera: CameraInfo \| null) => void                                       | Called when the scene is loaded.   |
+| onStateChangeStart    | (targetView: CurrentViewMetadata, targetViewGroup: ViewGroupMetadata, global: GlobalMetadata, camera: CameraInfo \| null) => void   | Called when the scene is changing. |
+| onStateChangeComplete | (currentView: CurrentViewMetadata, currentViewGroup: ViewGroupMetadata, global: GlobalMetadata, camera: CameraInfo \| null) => void | Called when the scene is changed.  |
+| onError               | (error: string) => void                                                                                                             | Called when the scene is error.    |
 
-Where `LinkedScene`, `ViewMetadata`, `CurrentViewMetadata`, `ViewGroupMetadata`, and `GlobalMetadata` are defined as follows:
+Where `LinkedScene`, `ViewMetadata`, `CurrentViewMetadata`, `ViewGroupMetadata`, `GlobalMetadata`, and `CameraInfo` are defined as follows:
 
 ```ts
 export type LinkedScene = {
@@ -133,9 +137,19 @@ export type GlobalMetadata = ViewMetadata & {
   summaryImage: string | null;
   linkedScenes: LinkedScene[];
 };
+
+export type CameraInfo = {
+  getPosition: () => [number, number, number];
+  getLookat: () => [number, number, number];
+  getZoom: () => number;
+  setPosition: (position: [number, number, number]) => void;
+  setLookat: (lookat: [number, number, number]) => void;
+  setZoom: (zoom: number) => void;
+};
 ```
 
 These Events and metadata that are passed in the events could be used to run logics in your application, such as updating the UI or state.
+The `CameraInfo` object provides methods to override controls to the the camera position, lookat point, and zoom level programmatically.
 
 ```jsx
 import React from "react";
