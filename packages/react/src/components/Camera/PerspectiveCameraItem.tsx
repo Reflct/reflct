@@ -8,8 +8,6 @@ import * as THREE from "three";
 import { useCanvasContext } from "../../context";
 import { mapMetadataToRecord } from "../../utils/helper";
 
-gsap.registerPlugin(CustomEase);
-
 type Props = PerspectiveCameraData;
 
 const PerspectiveCameraItem: React.FC<Props> = (props) => {
@@ -97,6 +95,8 @@ const PerspectiveCameraItem: React.FC<Props> = (props) => {
   }, []);
 
   useEffect(() => {
+    gsap.registerPlugin(CustomEase);
+
     const camera = ref.current;
     const control = controlRef.current;
 
