@@ -1,4 +1,4 @@
-import { LinkedScene } from "@reflct/api-internal";
+import { LinkedScene } from "@reflct/api";
 
 export type ViewMetadata = {
   title?: string;

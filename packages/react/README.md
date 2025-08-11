@@ -32,21 +32,6 @@ const Page = () => {
 export default Page;
 ```
 
-### CSS Styling
-
-The package includes CSS modules for component styling. You can import the CSS in one of two ways:
-
-1. **Import the main CSS file** (recommended):
-
-   ```jsx
-   import "@reflct/react/style.css";
-   ```
-
-2. **Import the CSS file directly**:
-   ```jsx
-   import "@reflct/react/dist/react-internal.css";
-   ```
-
 ## Documentation
 
 TBC.

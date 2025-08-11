@@ -1,4 +1,4 @@
-import { SceneDto } from "@reflct/api-internal";
+import { SceneDto } from "@reflct/api";
 import * as pc from "playcanvas";
 import React, { useEffect, useRef } from "react";
 import { useCanvasContext } from "../../context/CanvasContext";
@@ -129,7 +129,9 @@ const HitPoints: React.FC<{ hitPoint?: HitPoint }> = ({ hitPoint }) => {
         return (
           <HitPointWrapper transition={transition} key={id}>
             <button
-              className={`${styles["hit-point"]} ${isSelected ? styles["selected"] : ""}`}
+              className={`${styles["hit-point"]} ${
+                isSelected ? styles["selected"] : ""
+              }`}
               onClick={() => {
                 if (automode) {
                   return;

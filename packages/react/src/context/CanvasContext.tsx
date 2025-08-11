@@ -1,4 +1,4 @@
-import { client, SceneDto, ReflctApiError } from "@reflct/api-internal";
+import { client, SceneDto, ReflctApiError } from "@reflct/api";
 import gsap from "gsap";
 import React, {
   createContext,
@@ -193,11 +193,16 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
         );
       } catch (error) {
         if (error instanceof ReflctApiError) {
+          console.error(error);
           setError(error);
         } else {
-          setError(
-            new ReflctApiError("internal_server_error", "Something went wrong")
+          const apiError = new ReflctApiError(
+            "internal_server_error",
+            "Something went wrong"
           );
+
+          console.error(apiError);
+          setError(apiError);
         }
       } finally {
         dataRef.current.isFetching = false;

@@ -13,6 +13,7 @@ import ErrorHandler from "../ErrorHandler/ErrorHandler";
 import HitPoints, { HitPoint } from "../HitPoints/HitPoints";
 import UI, { UIChild } from "../UI/UI";
 import styles from "./Canvas.module.css";
+import viewerStyles from "../Viewer.module.css";
 
 type Props = {
   className?: string;
@@ -483,7 +484,7 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
 
   return (
     <div
-      className={`${styles["reflct-wrapper"]} ${className || ""}`}
+      className={`${viewerStyles["reflct-wrapper"]} ${className || ""}`}
       ref={containerRef}
     >
       <canvas
