@@ -1,15 +1,15 @@
 import React from "react";
-import { useCanvasContext } from "../../context";
+import { useCanvasContext } from "../../context/CanvasContext";
 import {
   CurrentViewMetadata,
   GlobalMetadata,
   ViewGroupMetadata,
 } from "../../types/common";
+import ArrowControls from "./ArrowControls/ArrowControls";
+import LinkedSceneControls from "./LinkedSceneControls/LinkedSceneControls";
+import LoadingIndicator from "./LoadingIndicator/LoadingIndicator";
+import TextDetails from "./TextDetails/TextDetails";
 import { mapMetadataToRecord } from "../../utils/helper";
-import ArrowControls from "../ArrowControls";
-import LinkedSceneControls from "../LinkedSceneControls/LinkedSceneControls";
-import LoadingIndicator from "../LoadingIndicator";
-import TextDetails from "../TextDetails";
 
 export type UIChild = (state: {
   index: number;
@@ -34,23 +34,16 @@ const UI: React.FC<Props> = ({ ui }) => {
     isLoading,
     loadProgress,
     automode,
-    setAutomode,
-    state,
-    setState,
-    name,
-    description,
-    metadata,
-    transitions,
-    transitionGroups,
-    linkedScenes,
-    summaryImage,
-    loadScene,
+    currentState,
+    views,
+    sceneData,
+    actionsRef,
   } = useCanvasContext();
 
   if (ui) {
-    const currentTransition = transitions.at(state % transitions.length);
-    const currentTransitionGroup = transitionGroups?.find((group) =>
-      group.transitions.find((x) => x.id === currentTransition?.id)
+    const currentTransition = views.at(currentState);
+    const currentTransitionGroup = sceneData?.data.transitionGroups?.find(
+      (group) => group.transitions.find((x) => x.id === currentTransition?.id)
     );
 
     const nextView = () => {
@@ -58,7 +51,7 @@ const UI: React.FC<Props> = ({ ui }) => {
         return;
       }
 
-      setState((state + 1) % transitions.length);
+      actionsRef.current.setState(currentState + 1);
     };
 
     const prevView = () => {
@@ -66,11 +59,11 @@ const UI: React.FC<Props> = ({ ui }) => {
         return;
       }
 
-      setState((state - 1) % transitions.length);
+      actionsRef.current.setState(currentState - 1);
     };
 
     return ui({
-      index: state,
+      index: currentState,
       currentView: {
         title: currentTransition?.title,
         description: currentTransition?.description,
@@ -90,20 +83,20 @@ const UI: React.FC<Props> = ({ ui }) => {
           })) || [],
       },
       global: {
-        title: name ?? "",
-        description: description ?? "",
-        metadata: mapMetadataToRecord(metadata ?? {}),
-        numberOfViews: transitions.length,
-        summaryImage,
-        linkedScenes,
+        title: sceneData?.name ?? "",
+        description: sceneData?.description ?? "",
+        metadata: mapMetadataToRecord(sceneData?.metadata ?? {}),
+        numberOfViews: views.length,
+        summaryImage: sceneData?.summaryImage ?? null,
+        linkedScenes: sceneData?.linkedScenes ?? [],
       },
       automode,
-      setAutomode,
+      setAutomode: actionsRef.current.setAutomode,
       isLoading,
       loadProgress,
       nextView,
       prevView,
-      loadScene,
+      loadScene: actionsRef.current.loadScene,
     });
   }
 

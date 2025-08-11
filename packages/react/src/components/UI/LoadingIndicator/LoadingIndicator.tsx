@@ -1,7 +1,7 @@
 import React from "react";
 
 import styles from "./LoadingIndicator.module.css";
-import { useCanvasContext } from "../../context";
+import { useCanvasContext } from "../../../context/CanvasContext";
 
 type Props = {
   className?: string;

@@ -1,3 +1,10 @@
+.hit-point-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+}
+
 .hit-point {
   position: absolute;
   border-radius: 9999px;
@@ -10,10 +17,9 @@
   width: 20px;
   height: 20px;
 
-  background: transparent;
-  border: none;
-
-  transition: width 0.2s ease-in-out, height 0.2s ease-in-out,
+  transition:
+    width 0.2s ease-in-out,
+    height 0.2s ease-in-out,
     opacity 0.2s ease-in-out;
 }
 
@@ -35,7 +41,9 @@
   width: 18px;
   height: 18px;
 
-  transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+  transition:
+    width 0.2s ease-in-out,
+    height 0.2s ease-in-out;
 }
 
 .hit-point.selected .indicator {

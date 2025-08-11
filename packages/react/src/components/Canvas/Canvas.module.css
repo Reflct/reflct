@@ -2,4 +2,26 @@
   position: relative;
   width: 100%;
   height: 100%;
+  /* Prevent touch scrolling */
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Prevent text selection */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure canvas element also prevents touch scrolling */
+.reflct-canvas canvas {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }

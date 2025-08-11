@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { useCanvasContext } from "../../context";
+import { useState } from "react";
+import { useCanvasContext } from "../../../context/CanvasContext";
 
 import styles from "./LinkedSceneControls.module.css";
 
 const LinkedSceneControls = () => {
-  const { linkedScenes, loadScene } = useCanvasContext();
+  const { sceneData, actionsRef } = useCanvasContext();
 
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
     <div
-      className={`${styles["reflct-linked-scenes"]} ${linkedScenes.length > 0 ? styles["show"] : ""}`}
+      className={`${styles["reflct-linked-scenes"]} ${sceneData?.linkedScenes?.length ? styles["show"] : ""}`}
     >
       <button
         className={`${styles["select"]} ${showDropdown ? styles["active"] : ""}`}
@@ -34,11 +34,11 @@ const LinkedSceneControls = () => {
       <div
         className={`${styles["dropdown"]} ${showDropdown ? styles["show"] : ""}`}
       >
-        {linkedScenes.map((scene) => (
+        {sceneData?.linkedScenes?.map((scene) => (
           <button
             key={scene.id}
             onClick={() => {
-              loadScene(scene.id);
+              actionsRef.current.loadScene(scene.id);
               setShowDropdown(false);
             }}
           >

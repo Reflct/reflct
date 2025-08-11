@@ -1,10 +1,10 @@
 import React from "react";
 
-import { useCanvasContext } from "../../context";
+import { useCanvasContext } from "../../../context/CanvasContext";
 import styles from "./ArrowControls.module.css";
 
 const ArrowControls: React.FC = () => {
-  const { automode, state, setState, setAutomode } = useCanvasContext();
+  const { automode, state, actionsRef } = useCanvasContext();
 
   return (
     <div className={styles["reflct-controls"]}>
@@ -13,8 +13,9 @@ const ArrowControls: React.FC = () => {
         onClick={() => {
           if (automode) return;
 
-          setState(state - 1);
+          actionsRef.current.setState(actionsRef.current.getCurrentState() - 1);
         }}
+        disabled={automode}
       >
         <svg
           width="21"
@@ -34,7 +35,7 @@ const ArrowControls: React.FC = () => {
       </button>
       <button
         className={`${styles["button"]} ${styles["big"]}`}
-        onClick={() => setAutomode(!automode)}
+        onClick={() => actionsRef.current.setAutomode(!automode)}
       >
         {automode ? (
           <svg
@@ -72,8 +73,9 @@ const ArrowControls: React.FC = () => {
         onClick={() => {
           if (automode) return;
 
-          setState(state + 1);
+          actionsRef.current.setState(actionsRef.current.getCurrentState() + 1);
         }}
+        disabled={automode}
       >
         <svg
           width="21"
