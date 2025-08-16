@@ -74,7 +74,7 @@ export class CameraControlsScript extends PcScript {
   private lastPolarAngle: number = 0;
   private angleChangeTime: number = 0;
   private angleChangeThreshold: number = 3; // seconds to wait before changing direction
-  private autoRotateDuration: number = 30; // seconds to reach min/max angles
+  private autoRotateDuration: number = 10; // seconds to reach min/max angles
 
   private mouseDownHandler: (event: MouseEvent) => void = () => {};
   private mouseMoveHandler: (event: MouseEvent) => void = () => {};
@@ -1062,14 +1062,14 @@ export class CameraControlsScript extends PcScript {
    */
   private calculateDynamicSpeeds(): void {
     // Calculate azimuth speed
-    let minAzimuth = Math.min(this.minAzimuthAngle * -1, Math.PI / 10);
-    let maxAzimuth = Math.min(this.maxAzimuthAngle, Math.PI / 10);
+    let minAzimuth = Math.min(this.minAzimuthAngle, Math.PI / 30);
+    let maxAzimuth = Math.min(this.maxAzimuthAngle, Math.PI / 30);
 
     let azimuthRange = maxAzimuth + minAzimuth;
 
     // Calculate polar speed
-    let minPolar = Math.min(this.minPolarAngle, Math.PI / 20);
-    let maxPolar = Math.min(this.maxPolarAngle, Math.PI / 20);
+    let minPolar = Math.min(this.minPolarAngle, Math.PI / 60);
+    let maxPolar = Math.min(this.maxPolarAngle, Math.PI / 60);
 
     let polarRange = maxPolar + minPolar;
 
@@ -1148,13 +1148,13 @@ export class CameraControlsScript extends PcScript {
       // Clamp azimuth angle
       if (this.minAzimuthAngle !== -Infinity) {
         newAzimuthAngle = Math.max(
-          this.baseAzimuthAngle + this.minAzimuthAngle,
+          this.baseAzimuthAngle - this.minAzimuthAngle,
           newAzimuthAngle
         );
       }
 
       newAzimuthAngle = Math.max(
-        this.baseAzimuthAngle - Math.PI / 10,
+        this.baseAzimuthAngle - Math.PI / 30,
         newAzimuthAngle
       );
 
@@ -1166,7 +1166,7 @@ export class CameraControlsScript extends PcScript {
       }
 
       newAzimuthAngle = Math.min(
-        this.baseAzimuthAngle + Math.PI / 10,
+        this.baseAzimuthAngle + Math.PI / 30,
         newAzimuthAngle
       );
 
@@ -1183,12 +1183,12 @@ export class CameraControlsScript extends PcScript {
       );
 
       newPolarAngle = Math.max(
-        this.basePolarAngle - Math.PI / 20,
+        this.basePolarAngle - Math.PI / 60,
         0,
         newPolarAngle
       );
       newPolarAngle = Math.min(
-        this.basePolarAngle + Math.PI / 20,
+        this.basePolarAngle + Math.PI / 60,
         Math.PI,
         newPolarAngle
       );
