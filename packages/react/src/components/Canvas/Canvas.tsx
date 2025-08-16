@@ -176,6 +176,9 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
         timeline.kill();
       }
 
+      cameraControls.setAutoRotate(false);
+      cameraControls.setHasUserInteracted(true);
+
       const views = actionsRef.current.getViews();
 
       const targetState = (state + views.length) % views.length;

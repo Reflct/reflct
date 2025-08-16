@@ -63,6 +63,19 @@ export class CameraControlsScript extends PcScript {
   private panDisabled: boolean = true;
   private rotateDisabled: boolean = false;
 
+  // Auto-rotation properties
+  private autoRotate: boolean = true;
+  private autoRotateSpeed: number = 0.01; // radians per second (will be calculated dynamically)
+  private userHasInteracted: boolean = false;
+  private autoRotateDirection: number = 1; // 1 for clockwise, -1 for counter-clockwise
+  private autoRotatePolarSpeed: number = 0.02; // radians per second (will be calculated dynamically)
+  private autoRotatePolarDirection: number = 1; // 1 for up, -1 for down
+  private lastAzimuthAngle: number = 0;
+  private lastPolarAngle: number = 0;
+  private angleChangeTime: number = 0;
+  private angleChangeThreshold: number = 3; // seconds to wait before changing direction
+  private autoRotateDuration: number = 30; // seconds to reach min/max angles
+
   private mouseDownHandler: (event: MouseEvent) => void = () => {};
   private mouseMoveHandler: (event: MouseEvent) => void = () => {};
   private mouseUpHandler: (event: MouseEvent) => void = () => {};
@@ -141,6 +154,9 @@ export class CameraControlsScript extends PcScript {
     this.setTargetPosition(new Vec3(0, 0, 0));
     this.setTargetZoom(1);
 
+    // Calculate initial dynamic speeds
+    this.calculateDynamicSpeeds();
+
     // Set initial camera position
     this.updateCameraPosition();
 
@@ -153,6 +169,9 @@ export class CameraControlsScript extends PcScript {
       lookAt: this.getLookAt(),
       zoom: this.getZoom(),
     };
+
+    this.autoRotateDirection = Math.random() > 0.5 ? 1 : -1;
+    this.autoRotatePolarDirection = Math.random() > 0.5 ? 1 : -1;
 
     cameraInstances.set(this.entity.name, this);
   }
@@ -346,6 +365,10 @@ export class CameraControlsScript extends PcScript {
     // Don't handle wheel events if controls are disabled
     if (this.controlsDisabled || this.zoomDisabled) return;
 
+    // Stop auto-rotation on wheel interaction
+    this.userHasInteracted = true;
+    this.autoRotate = false;
+
     // Adjust distance based on wheel delta
     const delta = event.deltaY * this.wheelZoomSpeed;
     this.target.zoom = Math.max(
@@ -363,6 +386,8 @@ export class CameraControlsScript extends PcScript {
     if (this.controlsDisabled) return;
 
     this.isMouseDown = true;
+    this.userHasInteracted = true;
+    this.autoRotate = false;
 
     if (event.button === pc.MOUSEBUTTON_LEFT) {
       // Left mouse button - rotate
@@ -406,6 +431,8 @@ export class CameraControlsScript extends PcScript {
     if (this.controlsDisabled) return;
 
     this.isMouseDown = true;
+    this.userHasInteracted = true;
+    this.autoRotate = false;
 
     this.isDragging = true;
     this.lastX = event.touches[0].clientX;
@@ -874,6 +901,8 @@ export class CameraControlsScript extends PcScript {
     this.isMouseDown = false;
     this.isDragging = false;
     this.isPanning = false;
+    // Disable auto-rotation when controls are disabled
+    this.autoRotate = false;
   }
 
   /**
@@ -881,6 +910,10 @@ export class CameraControlsScript extends PcScript {
    */
   enableControls(): void {
     this.controlsDisabled = false;
+    // Re-enable auto-rotation if user hasn't interacted
+    if (!this.userHasInteracted) {
+      this.autoRotate = true;
+    }
   }
 
   /**
@@ -933,18 +966,116 @@ export class CameraControlsScript extends PcScript {
 
   setMaxAzimuthAngle(maxAzimuthAngle: number): void {
     this.maxAzimuthAngle = maxAzimuthAngle;
+    this.calculateDynamicSpeeds();
   }
 
   setMinAzimuthAngle(minAzimuthAngle: number): void {
     this.minAzimuthAngle = minAzimuthAngle;
+    this.calculateDynamicSpeeds();
   }
 
   setMaxPolarAngle(maxPolarAngle: number): void {
     this.maxPolarAngle = maxPolarAngle;
+    this.calculateDynamicSpeeds();
   }
 
   setMinPolarAngle(minPolarAngle: number): void {
     this.minPolarAngle = minPolarAngle;
+    this.calculateDynamicSpeeds();
+  }
+
+  /**
+   * Enable or disable auto-rotation
+   * @param enabled Whether auto-rotation should be enabled
+   */
+  setAutoRotate(enabled: boolean): void {
+    this.autoRotate = enabled;
+  }
+
+  setHasUserInteracted(hasUserInteracted: boolean): void {
+    this.userHasInteracted = hasUserInteracted;
+  }
+
+  /**
+   * Set the auto-rotation speed in radians per second
+   * @param speed The rotation speed in radians per second
+   */
+  setAutoRotateSpeed(speed: number): void {
+    this.autoRotateSpeed = speed;
+  }
+
+  /**
+   * Reset the user interaction state, allowing auto-rotation to resume
+   */
+  resetUserInteraction(): void {
+    this.userHasInteracted = false;
+    // Reset auto-rotation timers
+    this.angleChangeTime = 0;
+    // Reset directions to default
+    this.autoRotateDirection = Math.random() > 0.5 ? 1 : -1;
+    this.autoRotatePolarDirection = Math.random() > 0.5 ? 1 : -1;
+  }
+
+  /**
+   * Check if auto-rotation is currently enabled
+   * @returns true if auto-rotation is enabled
+   */
+  isAutoRotateEnabled(): boolean {
+    return this.autoRotate;
+  }
+
+  /**
+   * Check if the user has interacted with the camera
+   * @returns true if the user has interacted
+   */
+  hasUserInteracted(): boolean {
+    return this.userHasInteracted;
+  }
+
+  /**
+   * Set the auto-rotation polar speed
+   * @param speed The polar angle speed in radians per second
+   */
+  setAutoRotatePolarSpeed(speed: number): void {
+    this.autoRotatePolarSpeed = speed;
+  }
+
+  /**
+   * Set the angle change threshold for direction changes
+   * @param threshold The time in seconds to wait before changing direction when hitting bounds
+   */
+  setAngleChangeThreshold(threshold: number): void {
+    this.angleChangeThreshold = threshold;
+  }
+
+  /**
+   * Set the auto-rotation duration (time to reach min/max angles)
+   * @param duration The time in seconds to reach min/max angles
+   */
+  setAutoRotateDuration(duration: number): void {
+    this.autoRotateDuration = duration;
+    this.calculateDynamicSpeeds();
+  }
+
+  /**
+   * Calculate dynamic auto-rotation speeds based on min/max angles
+   */
+  private calculateDynamicSpeeds(): void {
+    // Calculate azimuth speed
+    let minAzimuth = Math.min(this.minAzimuthAngle * -1, Math.PI / 10);
+    let maxAzimuth = Math.min(this.maxAzimuthAngle, Math.PI / 10);
+
+    let azimuthRange = maxAzimuth + minAzimuth;
+
+    // Calculate polar speed
+    let minPolar = Math.min(this.minPolarAngle, Math.PI / 20);
+    let maxPolar = Math.min(this.maxPolarAngle, Math.PI / 20);
+
+    let polarRange = maxPolar + minPolar;
+
+    // Calculate speeds to reach boundaries in autoRotateDuration seconds
+    this.autoRotateSpeed = azimuthRange / this.autoRotateDuration;
+    this.autoRotatePolarSpeed = polarRange / this.autoRotateDuration;
   }
 
   private clampTargetAzimuthAngle() {
@@ -983,6 +1114,119 @@ export class CameraControlsScript extends PcScript {
   }
 
   update(dt: number) {
+    // Handle keyboard input to stop auto-rotation
+    if (this.keyboard && this.focused) {
+      if (
+        this.keyboard.isPressed(pc.KEY_LEFT) ||
+        this.keyboard.isPressed(pc.KEY_RIGHT) ||
+        this.keyboard.isPressed(pc.KEY_UP) ||
+        this.keyboard.isPressed(pc.KEY_DOWN)
+      ) {
+        this.userHasInteracted = true;
+        this.autoRotate = false;
+      }
+    }
+
+    // Handle auto-rotation if enabled and user hasn't interacted
+    if (this.autoRotate && !this.userHasInteracted && !this.controlsDisabled) {
+      // Store previous angles for comparison
+      const previousAzimuthAngle = this.target.azimuthAngle;
+      const previousPolarAngle = this.target.polarAngle;
+
+      // Apply auto-rotation to azimuth angle with direction
+      const expectedAzimuth =
+        this.target.azimuthAngle +
+        this.autoRotateSpeed * this.autoRotateDirection * dt;
+      const expectedPolar =
+        this.target.polarAngle +
+        this.autoRotatePolarSpeed * this.autoRotatePolarDirection * dt;
+
+      let newAzimuthAngle = expectedAzimuth;
+      let newPolarAngle = expectedPolar;
+
+      // Ensure the angles stay within bounds
+      // Clamp azimuth angle
+      if (this.minAzimuthAngle !== -Infinity) {
+        newAzimuthAngle = Math.max(
+          this.baseAzimuthAngle + this.minAzimuthAngle,
+          newAzimuthAngle
+        );
+      }
+
+      newAzimuthAngle = Math.max(
+        this.baseAzimuthAngle - Math.PI / 10,
+        newAzimuthAngle
+      );
+
+      if (this.maxAzimuthAngle !== Infinity) {
+        newAzimuthAngle = Math.min(
+          this.baseAzimuthAngle + this.maxAzimuthAngle,
+          newAzimuthAngle
+        );
+      }
+
+      newAzimuthAngle = Math.min(
+        this.baseAzimuthAngle + Math.PI / 10,
+        newAzimuthAngle
+      );
+
+      // Clamp polar angle
+      newPolarAngle = Math.max(
+        this.basePolarAngle - this.minPolarAngle,
+        0,
+        newPolarAngle
+      );
+      newPolarAngle = Math.min(
+        this.basePolarAngle + this.maxPolarAngle,
+        Math.PI,
+        newPolarAngle
+      );
+
+      newPolarAngle = Math.max(
+        this.basePolarAngle - Math.PI / 20,
+        0,
+        newPolarAngle
+      );
+      newPolarAngle = Math.min(
+        this.basePolarAngle + Math.PI / 20,
+        Math.PI,
+        newPolarAngle
+      );
+
+      // // If the actual change is significantly different from expected, it was clamped
+      const azimuthWasClamped = expectedAzimuth !== newAzimuthAngle;
+      const polarWasClamped = expectedPolar !== newPolarAngle;
+
+      // If angles were clamped, start timer for direction change
+      if (azimuthWasClamped || polarWasClamped) {
+        this.angleChangeTime += dt;
+
+        // Change direction after threshold time
+        if (this.angleChangeTime >= this.angleChangeThreshold) {
+          if (azimuthWasClamped) {
+            this.autoRotateDirection = -this.autoRotateDirection;
+          } else {
+            this.autoRotateDirection = Math.random() > 0.5 ? 1 : -1;
+          }
+
+          if (polarWasClamped) {
+            this.autoRotatePolarDirection = -this.autoRotatePolarDirection;
+          } else {
+            this.autoRotatePolarDirection = Math.random() > 0.5 ? 1 : -1;
+          }
+
+          this.calculateDynamicSpeeds();
+
+          this.angleChangeTime = 0;
+        }
+      } else {
+        // Reset timer if not hitting bounds
+        this.angleChangeTime = 0;
+        this.target.polarAngle = newPolarAngle;
+        this.target.azimuthAngle = newAzimuthAngle;
+      }
+    }
+
     // Clamp target azimuth angle
     this.clampTargetAzimuthAngle();
     this.clampTargetPolarAngle();
