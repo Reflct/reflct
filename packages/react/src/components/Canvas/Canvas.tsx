@@ -335,6 +335,12 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
               },
               cameraRef.current
             );
+
+            if (actionsRef.current.getAutomode()) {
+              actionsRef.current.setState(
+                (state + 1 + views.length) % views.length
+              );
+            }
           },
         })
         .to(reference, {

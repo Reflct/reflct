@@ -21,6 +21,7 @@ type CanvasContextActionsType = {
   getViews: () => SceneDto["data"]["transitionGroups"][0]["transitions"];
   setState: (state: number) => void;
   getTransitionSpeedMultiplier: () => number;
+  getAutomode: () => boolean;
   setAutomode: (automode: boolean) => void;
   loadScene: (sceneId: string) => Promise<void>;
 };
@@ -101,6 +102,7 @@ export const CanvasContext = createContext<CanvasContextType>({
       getViews: () => [],
       setState: () => {},
       getTransitionSpeedMultiplier: () => 1,
+      getAutomode: () => false,
       setAutomode: () => {},
       loadScene: () => Promise.resolve(),
     },
@@ -141,6 +143,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     getViews: () => [],
     setState: () => {},
     getTransitionSpeedMultiplier: () => 1,
+    getAutomode: () => false,
     setAutomode: () => {},
     loadScene: () => Promise.resolve(),
   });
@@ -236,6 +239,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     };
     actionsRef.current.getTransitionSpeedMultiplier = () =>
       automode ? automodeTransitionSpeedMultiplier : transitionSpeedMultiplier;
+    actionsRef.current.getAutomode = () => automode;
     actionsRef.current.setAutomode = (automode: boolean) => {
       setAutomode(automode);
     };
@@ -281,19 +285,6 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     }
 
     actionsRef.current.setState(actionsRef.current.getCurrentState() + 1);
-
-    const animation = gsap
-      .timeline({
-        repeat: -1,
-        duration: 3,
-      })
-      .call(() => {
-        actionsRef.current.setState(actionsRef.current.getCurrentState() + 1);
-      });
-
-    return () => {
-      animation.kill();
-    };
   }, [automode]);
 
   return (
