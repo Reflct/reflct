@@ -14,17 +14,24 @@ export const client = {
     );
 
     if (!response.ok) {
-      if (response.status === 402) {
-        throw new ReflctApiError(
-          "payment_required",
-          "Payment is required to integrate scene."
-        );
-      }
-
       if (response.status === 404) {
         throw new ReflctApiError(
           "scene_not_found",
           "Scene could not be found."
+        );
+      }
+
+      if (response.status === 403) {
+        throw new ReflctApiError(
+          "integration_not_allowed",
+          "Integration is not allowed for this tier"
+        );
+      }
+
+      if (response.status === 402) {
+        throw new ReflctApiError(
+          "integration_not_enabled",
+          "Scene integration needs to be enabled to be accessed."
         );
       }
 
@@ -64,17 +71,24 @@ export const client = {
     );
 
     if (!response.ok) {
-      if (response.status === 403) {
-        throw new ReflctApiError(
-          "invalid_apikey",
-          "Scene cannot be accessed with the provided API key."
-        );
-      }
-
       if (response.status === 404) {
         throw new ReflctApiError(
           "scene_not_found",
           "The requested preview scene could not be found."
+        );
+      }
+
+      if (response.status === 403) {
+        throw new ReflctApiError(
+          "integration_not_allowed",
+          "Integration is not allowed for this tier"
+        );
+      }
+
+      if (response.status === 402) {
+        throw new ReflctApiError(
+          "integration_not_enabled",
+          "Scene integration needs to be enabled to be accessed."
         );
       }
 

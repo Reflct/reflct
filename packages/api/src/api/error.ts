@@ -3,7 +3,8 @@ type ErrorType =
   | "invalid_apikey"
   | "invalid_scene_id"
   | "internal_server_error"
-  | "payment_required";
+  | "integration_not_allowed"
+  | "integration_not_enabled";
 
 export class ReflctApiError extends Error {
   type: ErrorType;

@@ -185,24 +185,21 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
 
         setSceneData(response);
         setCurrentView(
-          response.data.transitionGroups[0].transitions[0] ||
+          response.data.transitionGroups?.[0]?.transitions?.[0] ||
             response.data.camera
         );
         setViews(
           response.data.transitionGroups.flatMap((group) => group.transitions)
         );
       } catch (error) {
+        console.error(error);
+
         if (error instanceof ReflctApiError) {
-          console.error(error);
           setError(error);
         } else {
-          const apiError = new ReflctApiError(
-            "internal_server_error",
-            "Something went wrong"
+          setError(
+            new ReflctApiError("internal_server_error", "Something went wrong")
           );
-
-          console.error(apiError);
-          setError(apiError);
         }
       } finally {
         dataRef.current.isFetching = false;

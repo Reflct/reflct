@@ -106,7 +106,7 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
     }
 
     const firstTransition =
-      sceneData.data.transitionGroups[0].transitions[0].item ||
+      sceneData.data.transitionGroups?.[0]?.transitions?.[0]?.item ||
       sceneData.data.camera;
 
     cameraControls.setValues({
@@ -181,6 +181,8 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
       const targetState = (state + views.length) % views.length;
 
       const targetView = views[targetState];
+
+      if (!targetView) return;
 
       const currentTransitionGroup = sceneData.data.transitionGroups.find(
         (group) => group.transitions.find((x) => x.id === targetView.id)
