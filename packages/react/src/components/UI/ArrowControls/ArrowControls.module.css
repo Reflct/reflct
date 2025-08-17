@@ -34,6 +34,12 @@
   cursor: pointer;
 }
 
+.reflct-controls > .button:disabled {
+  opacity: 0.28;
+  pointer-events: none;
+  cursor: default;
+}
+
 .reflct-controls > .button.big {
   width: 64px;
   height: 64px;

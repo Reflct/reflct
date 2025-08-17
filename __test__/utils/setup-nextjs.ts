@@ -13,13 +13,15 @@ export async function setupNextJsV14(paths: BuildConfig): Promise<void> {
     { cwd: paths.envDir }
   );
 
-  execSync(
-    "npm install three@0.168.0 @react-three/fiber@8 @react-three/drei@9",
-    {
-      cwd: nextTestEnv,
-    }
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-react.tgz"),
+    path.join(nextTestEnv, "reflct-react.tgz")
   );
-  execSync("npm install ../reflct-react.tgz", {
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-api.tgz"),
+    path.join(nextTestEnv, "reflct-api.tgz")
+  );
+  execSync("npm install ./reflct-react.tgz", {
     cwd: nextTestEnv,
   });
 
@@ -62,10 +64,16 @@ export async function setupNextJsV15(paths: BuildConfig): Promise<void> {
 
   execSync("npx create-next-app@15 next-v15-test --yes", { cwd: paths.envDir });
 
-  execSync("npm install three@0.168.0 @react-three/fiber @react-three/drei", {
-    cwd: nextTestEnv,
-  });
-  execSync("npm install ../reflct-react.tgz", {
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-react.tgz"),
+    path.join(nextTestEnv, "reflct-react.tgz")
+  );
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-api.tgz"),
+    path.join(nextTestEnv, "reflct-api.tgz")
+  );
+
+  execSync("npm install ./reflct-react.tgz", {
     cwd: nextTestEnv,
   });
 

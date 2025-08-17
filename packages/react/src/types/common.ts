@@ -1,7 +1,4 @@
-export type LinkedScene = {
-  id: string;
-  name: string;
-};
+import { LinkedScene } from "@reflct/api";
 
 export type ViewMetadata = {
   title?: string;

@@ -2,51 +2,18 @@
 
 A React library for integrating Reflct 3D scenes into your React apps.
 
-Visit [Reflct.app](https://reflct.app) for more information.
-
 ## Installation
-
-> [!IMPORTANT]
-> Compatibility with React 19
->
-> Recent releases of React 19 had compatibility issues with our dependencies.
-> So we've moved those dependencies to the peer dependencies to resolve the issues.
-> Make sure to install correct versions of peer dependencies to use this package from now on.
 
 To install the package, run:
 
 ```bash
-# Install peer dependencies
-npm install three@0.168.0 @react-three/fiber @react-three/drei
-
-# Install the package
 npm install @reflct/react
 ```
 
 or if you're using yarn:
 
 ```bash
-# Install peer dependencies
-yarn add three@0.168.0 @react-three/fiber @react-three/drei
-
-# Install the package
 yarn add @reflct/react
-```
-
-### React 18
-
-If you're using React 18, you need to install the following peer dependencies:
-
-- three@0.168.0
-- @react-three/fiber@8
-- @react-three/drei@9
-
-```bash
-# Install peer dependencies
-npm install three@0.168.0 @react-three/fiber@8 @react-three/drei@9
-
-# Install the package
-npm install @reflct/react
 ```
 
 ## Getting Started
@@ -303,15 +270,12 @@ If you wish to customise the UI of the hitpoints, you can do that by giving the 
 ## CORS issues and SharedArrayBuffer
 
 This package uses SharedArrayBuffer for performance as default. If you're using this in a browser environment, you may encounter CORS issues as stated here [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements).
-
 As a baseline requirement, your document needs to be in a secure context.
-
 For top-level documents, two headers need to be set to cross-origin isolate your site:
 
 - <u>Cross-Origin-Opener-Policy</u> with <i>same-origin</i> as value (protects your origin from attackers)
 - <u>Cross-Origin-Embedder-Policy</u> with <i>require-corp</i> or <i>credentialless</i> as value (protects victims from your origin)
-
-As stated, you can set the following headers in your server:
+  As stated, you can set the following headers in your server:
 
 ```
 Cross-Origin-Opener-Policy: same-origin

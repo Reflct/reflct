@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useCanvasContext } from "../../context";
+import { useCanvasContext } from "../../../context/CanvasContext";
 
+import containerStyles from "../../Viewer.module.css";
 import styles from "./TextDetails.module.css";
-import containerStyles from "../../css/Container.module.css";
 
 const TextDetails: React.FC = () => {
-  const { isLoading, state, transitions } = useCanvasContext();
+  const { isLoading, currentState, currentView } = useCanvasContext();
 
   const [showTextDetails, setShowTextDetails] = useState(false);
 
   useEffect(() => {
     setShowTextDetails(true);
-  }, [state]);
+  }, [currentState]);
 
-  const currentTransition = transitions.at(state % transitions.length);
-
-  if (isLoading || !currentTransition?.showTextDetails || !showTextDetails) {
+  if (isLoading || !currentView?.showTextDetails || !showTextDetails) {
     return null;
   }
 
@@ -23,11 +21,11 @@ const TextDetails: React.FC = () => {
     <div
       className={`${containerStyles["reflct-text-details"]} ${styles["reflct-text-details"]}`}
     >
-      <h3>{currentTransition.title}</h3>
-      {currentTransition.description && (
+      <h3>{currentView.title}</h3>
+      {currentView.description && (
         <div
           className={styles["reflct-text-details-description"]}
-          dangerouslySetInnerHTML={{ __html: currentTransition.description }}
+          dangerouslySetInnerHTML={{ __html: currentView.description }}
         />
       )}
 

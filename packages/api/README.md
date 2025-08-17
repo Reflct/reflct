@@ -26,12 +26,12 @@ await client.getScene(id, apikey);
 
 // Get preview scene data
 await client.getPreviewScene(id, apikey);
-```
 
-## License
+## Licence
 
-See license in [LICENSE](./LICENSE)
+This project is MIT licensed.
 
 ## Authors
 
 - In Ha Ryu <inha.ryu.97@gmail.com>
+```

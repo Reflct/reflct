@@ -1,9 +1,4 @@
-import type {
-  PerspectiveCameraData,
-  SceneDataDto,
-  Transition,
-} from "@reflct/api";
-import { client } from "@reflct/api";
+import { client, SceneDto, ReflctApiError } from "@reflct/api";
 import gsap from "gsap";
 import React, {
   createContext,
@@ -17,15 +12,24 @@ import {
   CameraInfo,
   CurrentViewMetadata,
   GlobalMetadata,
-  LinkedScene,
   ViewGroupMetadata,
 } from "../types/common";
+
+type CanvasContextActionsType = {
+  getCurrentState: () => number;
+  setCurrentState: (state: number) => void;
+  getViews: () => SceneDto["data"]["transitionGroups"][0]["transitions"];
+  setState: (state: number) => void;
+  getTransitionSpeedMultiplier: () => number;
+  getAutomode: () => boolean;
+  setAutomode: (automode: boolean) => void;
+  loadScene: (sceneId: string) => Promise<void>;
+};
 
 type CanvasContextBaseType = {
   id: string;
   apikey: string;
   isPreview?: boolean;
-  sharedMemoryForWorkers?: boolean;
   state?: number;
   transitionSpeedMultiplier: number;
   automodeTransitionSpeedMultiplier: number;
@@ -51,84 +55,58 @@ export type CanvasContextEventsType = {
     global: GlobalMetadata,
     camera: CameraInfo | null
   ) => void;
-  onError?: (error: string) => void;
+  onError?: (error: ReflctApiError) => void;
 };
 
 type CanvasContextType = CanvasContextBaseType & {
+  sceneData: SceneDto | null;
+  views: SceneDto["data"]["transitionGroups"][0]["transitions"];
+  currentView: SceneDto["data"]["transitionGroups"][0]["transitions"][0] | null;
+  currentViewGroup: SceneDto["data"]["transitionGroups"][0] | null;
+  currentState: number;
+  automode: boolean;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
-  automode: boolean;
-  setAutomode: (automode: boolean) => void;
   loadProgress: number;
   setLoadProgress: (loadProgress: number) => void;
-  name: string | null;
-  description: string | null;
-  metadata: Record<string, { value: string; updatedAt: string }> | null;
-  camera: PerspectiveCameraData | null;
-  items: SceneDataDto["items"];
-  transitionGroups: SceneDataDto["transitionGroups"];
-  transitions: Transition[];
-  backgroundColor: string | null;
-  summaryImage: string | null;
-  linkedScenes: LinkedScene[];
-
-  loadScene: (id: string) => Promise<void>;
-  onNewScene: (() => void)[];
-
-  state: number;
-  setState: React.Dispatch<React.SetStateAction<number>>;
-  dom: HTMLCanvasElement | null;
-  setDom: (dom: HTMLCanvasElement | null) => void;
-  error: Error | null;
-
-  // events
+  error: ReflctApiError | null;
   eventsRef: React.MutableRefObject<CanvasContextEventsType>;
-  dataRef: React.MutableRefObject<{
-    name?: string | null;
-    description?: string | null;
-    metadata?: Record<string, { value: string; updatedAt: string }> | null;
-    camera?: PerspectiveCameraData | null;
-    items?: SceneDataDto["items"];
-    transitionGroups?: SceneDataDto["transitionGroups"];
-    transitions?: Transition[];
-    backgroundColor?: string | null;
-    summaryImage?: string | null;
-    linkedScenes?: LinkedScene[];
-    cameraInfo?: CameraInfo | null;
-  }>;
+  cameraRef: React.MutableRefObject<CameraInfo | null>;
+  actionsRef: React.MutableRefObject<CanvasContextActionsType>;
 };
 
 export const CanvasContext = createContext<CanvasContextType>({
   id: "",
   apikey: "",
-  isLoading: true,
-  loadProgress: 0,
-  setLoadProgress: () => {},
-  automode: false,
-  setAutomode: () => {},
-  name: null,
-  description: null,
-  metadata: null,
-  camera: null,
+  isPreview: false,
   state: 0,
-  setState: () => {},
-  setIsLoading: () => {},
-  items: [],
-  transitionGroups: [],
-  transitions: [],
-  summaryImage: null,
-  loadScene: async (id: string) => {},
-  linkedScenes: [],
-  backgroundColor: null,
-  dom: null,
-  setDom: () => {},
-  error: null,
-  sharedMemoryForWorkers: false,
-  eventsRef: { current: {} },
-  dataRef: { current: {} },
-  onNewScene: [],
   transitionSpeedMultiplier: 1,
   automodeTransitionSpeedMultiplier: 0.5,
+  sceneData: null,
+  views: [],
+  currentView: null,
+  currentViewGroup: null,
+  currentState: 0,
+  automode: false,
+  isLoading: false,
+  setIsLoading: () => {},
+  loadProgress: 0,
+  setLoadProgress: () => {},
+  error: null,
+  eventsRef: { current: {} },
+  cameraRef: { current: null },
+  actionsRef: {
+    current: {
+      getCurrentState: () => 0,
+      setCurrentState: () => {},
+      getViews: () => [],
+      setState: () => {},
+      getTransitionSpeedMultiplier: () => 1,
+      getAutomode: () => false,
+      setAutomode: () => {},
+      loadScene: () => Promise.resolve(),
+    },
+  },
 });
 
 type CanvasContextProviderProps = {
@@ -142,220 +120,191 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
   events,
   children,
 }) => {
-  const { id, apikey, state = 0, isPreview, sharedMemoryForWorkers } = value;
+  const {
+    id,
+    apikey,
+    state = 0,
+    isPreview,
+    transitionSpeedMultiplier,
+    automodeTransitionSpeedMultiplier,
+  } = value;
 
-  const eventsRef = useRef<CanvasContextEventsType>(events);
   const dataRef = useRef<{
-    name: string | null;
-    description: string | null;
-    metadata: Record<string, { value: string; updatedAt: string }> | null;
-    camera: PerspectiveCameraData | null;
-    items: SceneDataDto["items"];
-    transitionGroups: SceneDataDto["transitionGroups"];
-    transitions: Transition[];
-    backgroundColor?: string | null;
-    summaryImage?: string | null;
-    linkedScenes?: LinkedScene[];
-    cameraInfo: CameraInfo | null;
+    isFetching: boolean;
   }>({
-    name: null,
-    description: null,
-    metadata: null,
-    camera: null,
-    items: [],
-    transitionGroups: [],
-    transitions: [],
-    backgroundColor: null,
-    summaryImage: null,
-    linkedScenes: [],
-    cameraInfo: null,
+    isFetching: false,
   });
-  const onNewSceneRef = useRef<(() => void)[]>([]);
 
-  const isFetchingRef = useRef(false);
+  const cameraRef = useRef<CameraInfo | null>(null);
+  const eventsRef = useRef<CanvasContextEventsType>(events);
+  const actionsRef = useRef<CanvasContextActionsType>({
+    getCurrentState: () => 0,
+    setCurrentState: () => {},
+    getViews: () => [],
+    setState: () => {},
+    getTransitionSpeedMultiplier: () => 1,
+    getAutomode: () => false,
+    setAutomode: () => {},
+    loadScene: () => Promise.resolve(),
+  });
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadProgress, setLoadProgress] = useState(0);
+  useEffect(() => {
+    eventsRef.current = events;
+  }, [events]);
 
-  const [automode, setAutomode] = useState(false);
-  const [currentState, setCurrentState] = useState(state);
-
-  const [name, setName] = useState<string | null>(null);
-  const [description, setDescription] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState<Record<
-    string,
-    {
-      value: string;
-      updatedAt: string;
-    }
-  > | null>(null);
-  const [camera, setCamera] = useState<PerspectiveCameraData | null>(null);
-  const [items, setItems] = useState<SceneDataDto["items"]>([]);
-  const [transitionGroups, setTransitionGroups] = useState<
-    SceneDataDto["transitionGroups"]
+  const [sceneData, setSceneData] = useState<SceneDto | null>(null);
+  const [currentView, setCurrentView] = useState<
+    SceneDto["data"]["transitionGroups"][0]["transitions"][0] | null
+  >(null);
+  const [currentViewGroup, setCurrentViewGroup] = useState<
+    SceneDto["data"]["transitionGroups"][0] | null
+  >(null);
+  const [views, setViews] = useState<
+    SceneDto["data"]["transitionGroups"][0]["transitions"]
   >([]);
-  const [transitions, setTransitions] = useState<Transition[]>([]);
-  const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
-  const [summaryImage, setSummaryImage] = useState<string | null>(null);
-  const [linkedScenes, setLinkedScenes] = useState<LinkedScene[]>([]);
+  const [automode, setAutomode] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadProgress, setLoadProgress] = useState<number>(0);
 
-  const [dom, setDom] = useState<HTMLCanvasElement | null>(null);
-  const [error, setError] = useState<Error | null>(null);
+  const [currentState, setCurrentState] = useState<number>(state);
+
+  const [error, setError] = useState<ReflctApiError | null>(null);
 
   const fetchData = useCallback(
     async (id: string, apikey: string, isPreview?: boolean) => {
-      if (isFetchingRef.current) {
+      if (dataRef.current.isFetching) {
         return;
       }
 
       try {
-        isFetchingRef.current = true;
+        dataRef.current.isFetching = true;
 
+        setIsLoading(true);
         eventsRef.current.onLoadStart?.();
 
         const response = isPreview
           ? await client.getPreviewScene(id, apikey)
           : await client.getScene(id, apikey);
 
-        setName(response.name);
-        setDescription(response.description);
-        setMetadata(response.metadata ?? {});
-
-        setItems(response.data.items);
-        setTransitionGroups(response.data.transitionGroups);
-        setTransitions(
+        setSceneData(response);
+        setCurrentView(
+          response.data.transitionGroups?.[0]?.transitions?.[0] ||
+            response.data.camera
+        );
+        setViews(
           response.data.transitionGroups.flatMap((group) => group.transitions)
         );
-        setCamera(response.data.camera);
-        setBackgroundColor(response.backgroundColor);
-
-        setSummaryImage(response.summaryImage ?? null);
-        setLinkedScenes(response.linkedScenes);
       } catch (error) {
-        setError(error as Error);
+        console.error(error);
+
+        if (error instanceof ReflctApiError) {
+          setError(error);
+        } else {
+          setError(
+            new ReflctApiError("internal_server_error", "Something went wrong")
+          );
+        }
       } finally {
-        isFetchingRef.current = false;
+        dataRef.current.isFetching = false;
       }
     },
     []
   );
 
   useEffect(() => {
-    fetchData(id, apikey, isPreview);
-  }, [id, apikey, isPreview, fetchData]);
+    if (error) {
+      eventsRef.current.onError?.(error);
+    }
+  }, [error]);
 
   useEffect(() => {
-    setCurrentState(state);
+    fetchData(id, apikey, isPreview);
+  }, []);
+
+  useEffect(() => {
+    if (currentState !== state) {
+      setCurrentState(state);
+    }
   }, [state]);
+
+  useEffect(() => {
+    actionsRef.current.getCurrentState = () => currentState;
+    actionsRef.current.setCurrentState = (state: number) => {
+      const length = views.length;
+
+      setCurrentState((state + length) % length);
+    };
+    actionsRef.current.getViews = () => {
+      return views;
+    };
+    actionsRef.current.getTransitionSpeedMultiplier = () =>
+      automode ? automodeTransitionSpeedMultiplier : transitionSpeedMultiplier;
+    actionsRef.current.getAutomode = () => automode;
+    actionsRef.current.setAutomode = (automode: boolean) => {
+      setAutomode(automode);
+    };
+    actionsRef.current.loadScene = async (sceneId: string) => {
+      setIsLoading(true);
+      setLoadProgress(0);
+
+      setSceneData(null);
+      setCurrentView(null);
+      setViews([]);
+
+      setCurrentState(0);
+
+      setAutomode(false);
+
+      setError(null);
+
+      await fetchData(sceneId, apikey, isPreview);
+    };
+  }, [
+    currentState,
+    views,
+    automode,
+    automodeTransitionSpeedMultiplier,
+    transitionSpeedMultiplier,
+  ]);
+
+  useEffect(() => {
+    setCurrentView(views[currentState]);
+  }, [currentState]);
+
+  useEffect(() => {
+    setCurrentViewGroup(
+      sceneData?.data.transitionGroups.find((group) =>
+        group.transitions.find((x) => x.id === currentView?.id)
+      ) || null
+    );
+  }, [currentView]);
 
   useEffect(() => {
     if (!automode) {
       return;
     }
 
-    setCurrentState((state) => (state + 1) % transitions.length);
-
-    const animation = gsap
-      .timeline({
-        repeat: -1,
-        duration: 3,
-      })
-      .call(() => {
-        setCurrentState((state) => (state + 1) % transitions.length);
-      });
-
-    return () => {
-      animation.kill();
-    };
+    actionsRef.current.setState(actionsRef.current.getCurrentState() + 1);
   }, [automode]);
-
-  useEffect(() => {
-    eventsRef.current = events;
-  }, [events]);
-
-  useEffect(() => {
-    dataRef.current = {
-      name,
-      description,
-      metadata,
-      camera,
-      items,
-      transitionGroups,
-      transitions,
-      backgroundColor,
-      summaryImage,
-      linkedScenes,
-      cameraInfo: dataRef.current.cameraInfo,
-    };
-  }, [
-    name,
-    description,
-    metadata,
-    camera,
-    items,
-    transitionGroups,
-    transitions,
-    backgroundColor,
-    summaryImage,
-    linkedScenes,
-  ]);
 
   return (
     <CanvasContext.Provider
       value={{
         ...value,
+        automode,
+        sceneData,
+        views,
+        currentState,
+        currentView,
+        currentViewGroup,
+        error,
+        eventsRef,
+        cameraRef,
+        actionsRef,
         isLoading,
         setIsLoading,
-        automode,
-        setAutomode,
         loadProgress,
         setLoadProgress,
-        name,
-        description,
-        metadata,
-        camera,
-        items,
-        transitionGroups,
-        transitions,
-        backgroundColor,
-        summaryImage,
-        linkedScenes,
-
-        state: currentState,
-        setState: setCurrentState,
-
-        loadScene: async (id: string) => {
-          onNewSceneRef.current.forEach((fn) => fn());
-          onNewSceneRef.current = [];
-
-          setIsLoading(true);
-          setLoadProgress(0);
-
-          setName("");
-          setDescription("");
-          setMetadata({});
-
-          setItems([]);
-          setTransitionGroups([]);
-          setTransitions([]);
-          setCamera(null);
-          setBackgroundColor(null);
-
-          setAutomode(false);
-          setCurrentState(0);
-
-          setSummaryImage(null);
-
-          fetchData(id, apikey, isPreview);
-        },
-
-        dom,
-        setDom,
-        error,
-        sharedMemoryForWorkers,
-        eventsRef,
-        dataRef,
-        onNewScene: onNewSceneRef.current,
       }}
     >
       {children}

@@ -1,6 +1,8 @@
-import { Html } from "@react-three/drei";
-import React from "react";
-import { useCanvasContext } from "../../context";
+import { SceneDto } from "@reflct/api";
+import * as pc from "playcanvas";
+import React, { useEffect, useRef } from "react";
+import { useCanvasContext } from "../../context/CanvasContext";
+import { getHitPointInstance, HitPointEvents } from "../../scripts/hitpoints";
 import styles from "./HitPoints.module.css";
 
 export type HitPoint = (state: {
@@ -10,56 +12,100 @@ export type HitPoint = (state: {
   select: () => void;
 }) => React.ReactNode;
 
+const HitPointWrapper = ({
+  transition,
+  children,
+}: {
+  transition: SceneDto["data"]["transitionGroups"][0]["transitions"][0];
+  children: React.ReactNode;
+}) => {
+  const { sceneData } = useCanvasContext();
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const hitPointInstance = getHitPointInstance(`hitpoints-${sceneData?.id}`);
+    if (!hitPointInstance) return;
+
+    const onCameraUpdate = (data: HitPointEvents["hitPointUpdate"]) => {
+      if (!ref.current) return;
+
+      if (data.isVisible) {
+        ref.current.style.visibility = "visible";
+      } else {
+        ref.current.style.visibility = "hidden";
+      }
+
+      ref.current.style.transform = `translate(${data.screenX}px, ${data.screenY}px)`;
+    };
+
+    hitPointInstance.addHitPoint(
+      transition.id,
+      new pc.Vec3(
+        transition.item.lookAt[0],
+        transition.item.lookAt[1],
+        transition.item.lookAt[2]
+      ),
+      onCameraUpdate
+    );
+
+    return () => {
+      hitPointInstance.removeHitPoint(transition.id, onCameraUpdate);
+    };
+  }, [transition, sceneData]);
+
+  return (
+    <div className={styles["hit-point-wrapper"]} ref={ref}>
+      {children}
+    </div>
+  );
+};
+
 const HitPoints: React.FC<{ hitPoint?: HitPoint }> = ({ hitPoint }) => {
   const {
     isLoading,
     state,
-    transitionGroups,
-    transitions,
-    setState,
+    views,
+    currentView,
+    currentViewGroup,
+    sceneData,
     automode,
+    actionsRef,
   } = useCanvasContext();
 
   if (isLoading) {
     return null;
   }
 
-  const currentTransition = transitions.at(state % transitions.length);
-  const currentTransitionGroup = transitionGroups?.find((group) =>
-    group.transitions.find((x) => x.id === currentTransition?.id)
-  );
-
   if (hitPoint) {
     return (
       <>
-        {transitionGroups.flatMap((group) => {
+        {sceneData?.data.transitionGroups.flatMap((group) => {
           const inCurrentGroup = Boolean(
-            group.transitions.find((x) => x.id === currentTransition?.id)
+            group.transitions.find((x) => x.id === currentView?.id)
           );
 
           return group.transitions.map((transition) => {
             const { id, item: transitionItem, showHitPoint } = transition;
 
-            const index = transitions.findIndex((x) => x.id === id);
-            const isSelected = id === currentTransition?.id;
+            const index = views.findIndex((x) => x.id === id);
+            const isSelected = id === currentView?.id;
 
             if (!showHitPoint) {
               return null;
             }
 
             return (
-              <Html
-                key={id}
-                position={transitionItem.lookAt}
-                zIndexRange={[0, 1]}
-              >
+              <HitPointWrapper transition={transition} key={id}>
                 {hitPoint({
                   index,
                   isSelected,
                   inCurrentGroup,
-                  select: () => setState(index % transitions.length),
+                  select: () => {
+                    actionsRef.current.setState(index);
+                  },
                 })}
-              </Html>
+              </HitPointWrapper>
             );
           });
         })}
@@ -69,34 +115,36 @@ const HitPoints: React.FC<{ hitPoint?: HitPoint }> = ({ hitPoint }) => {
 
   return (
     <>
-      {currentTransitionGroup?.transitions.map((transition) => {
+      {currentViewGroup?.transitions.map((transition) => {
         const { id, item: transitionItem, showHitPoint } = transition;
 
         if (!showHitPoint) {
           return null;
         }
 
-        const index = transitions.findIndex((x) => x.id === id);
+        const index = views.findIndex((x) => x.id === id);
 
-        const isSelected = id === currentTransition?.id;
+        const isSelected = id === currentView?.id;
 
         return (
-          <Html key={id} position={transitionItem.lookAt} zIndexRange={[0, 1]}>
+          <HitPointWrapper transition={transition} key={id}>
             <button
-              className={`${styles["hit-point"]} ${isSelected ? styles["selected"] : ""}`}
+              className={`${styles["hit-point"]} ${
+                isSelected ? styles["selected"] : ""
+              }`}
               onClick={() => {
                 if (automode) {
                   return;
                 }
 
-                setState(index % transitions.length);
+                actionsRef.current.setState(index);
               }}
             >
               <div className={styles["indicator"]}>
                 <div className={styles["center"]}></div>
               </div>
             </button>
-          </Html>
+          </HitPointWrapper>
         );
       })}
     </>

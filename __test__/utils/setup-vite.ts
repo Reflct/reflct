@@ -13,13 +13,17 @@ export async function setupViteV5(paths: BuildConfig): Promise<void> {
     cwd: paths.envDir,
   });
 
-  execSync(
-    "npm install three@0.168.0 @react-three/fiber@8 @react-three/drei@9",
-    {
-      cwd: viteTestEnv,
-    }
+  // Copy package files to the Vite project directory
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-react.tgz"),
+    path.join(viteTestEnv, "reflct-react.tgz")
   );
-  execSync("npm install ../reflct-react.tgz", {
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-api.tgz"),
+    path.join(viteTestEnv, "reflct-api.tgz")
+  );
+
+  execSync("npm install ./reflct-react.tgz", {
     cwd: viteTestEnv,
   });
 
@@ -70,10 +74,15 @@ export async function setupViteV6(paths: BuildConfig): Promise<void> {
     cwd: paths.envDir,
   });
 
-  execSync("npm install three@0.168.0 @react-three/fiber @react-three/drei", {
-    cwd: viteTestEnv,
-  });
-  execSync("npm install ../reflct-react.tgz", {
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-react.tgz"),
+    path.join(viteTestEnv, "reflct-react.tgz")
+  );
+  fs.copyFileSync(
+    path.join(paths.envDir, "reflct-api.tgz"),
+    path.join(viteTestEnv, "reflct-api.tgz")
+  );
+  execSync("npm install ./reflct-react.tgz", {
     cwd: viteTestEnv,
   });
 

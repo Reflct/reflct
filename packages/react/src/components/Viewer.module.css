@@ -1,0 +1,23 @@
+.reflct-wrapper {
+  container-name: reflct-container;
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+@container reflct-container (width < 768px) {
+  .reflct-wrapper .reflct-text-details {
+    display: none;
+  }
+}
+
+.reflct-loading-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: background-color 0.3s ease-in-out;
+  pointer-events: none;
+}
