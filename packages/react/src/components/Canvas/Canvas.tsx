@@ -498,13 +498,15 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
       className={`${viewerStyles["reflct-wrapper"]} ${className || ""}`}
       ref={containerRef}
     >
-      <canvas
-        className={className || styles["reflct-canvas"]}
-        ref={canvasRef}
-      />
+      {sceneData && (
+        <canvas
+          className={className || styles["reflct-canvas"]}
+          ref={canvasRef}
+        />
+      )}
 
       <div
-        className={styles["reflct-loading-screen"]}
+        className={viewerStyles["reflct-loading-screen"]}
         style={{
           backgroundColor: isLoading
             ? lastSceneBackground || "transparent"
