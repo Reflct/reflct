@@ -16,9 +16,16 @@ or if you're using yarn:
 yarn add @reflct/api
 ```
 
-## Documentation
+## How to use
 
-TBC.
+```js
+import { client } from "@reflct/api";
+
+// Get scene data
+await client.getScene(id, apikey);
+
+// Get preview scene data
+await client.getPreviewScene(id, apikey);
 
 ## Licence
 
@@ -27,3 +34,4 @@ This project is MIT licensed.
 ## Authors
 
 - In Ha Ryu <inha.ryu.97@gmail.com>
+```
