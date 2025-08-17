@@ -40,7 +40,6 @@ Viewer component has props for listening to events and customizing the UI.
   id={"your-scene-id"}
   apikey={"your-apikey"}
   isPreview={true}
-  sharedMemoryForWorkers={false}
   className={"your-class-name"}
   transitionSpeedMultiplier={1.0}
   automodeTransitionSpeedMultiplier={0.5}
@@ -61,7 +60,6 @@ Here are the basic props for the Viewer component:
 | id                                | string  | Your scene id                                                      |
 | apikey                            | string  | Your api key                                                       |
 | isPreview                         | boolean | Whether to use preview scene                                       |
-| sharedMemoryForWorkers            | boolean | Whether to use shared memory for workers                           |
 | className                         | string  | class name for the viewer                                          |
 | transitionSpeedMultiplier         | number  | Speed multiplier for camera transitions (default: 1)               |
 | automodeTransitionSpeedMultiplier | number  | Speed multiplier for camera transitions in automode (default: 0.5) |
@@ -266,31 +264,6 @@ If you wish to customise the UI of the hitpoints, you can do that by giving the 
 | isSelected     | boolean               | Whether the hitpoint is selected                  |
 | inCurrentGroup | boolean               | Whether the hitpoint is in the current view group |
 | select         | function (() => void) | The function to select the hitpoint               |
-
-## CORS issues and SharedArrayBuffer
-
-This package uses SharedArrayBuffer for performance as default. If you're using this in a browser environment, you may encounter CORS issues as stated here [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements).
-As a baseline requirement, your document needs to be in a secure context.
-For top-level documents, two headers need to be set to cross-origin isolate your site:
-
-- <u>Cross-Origin-Opener-Policy</u> with <i>same-origin</i> as value (protects your origin from attackers)
-- <u>Cross-Origin-Embedder-Policy</u> with <i>require-corp</i> or <i>credentialless</i> as value (protects victims from your origin)
-  As stated, you can set the following headers in your server:
-
-```
-Cross-Origin-Opener-Policy: same-origin
-Cross-Origin-Embedder-Policy: require-corp
-```
-
-If this is not possible, you can disable SharedArrayBuffer by setting the `sharedMemoryForWorkers` prop to `false` in the Viewer component.
-
-```jsx
-<Viewer
-  id={"your-scene-id"}
-  apikey={"your-apikey"}
-  sharedMemoryForWorkers={false}
-/>
-```
 
 ## License
 
