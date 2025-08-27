@@ -35,6 +35,7 @@ export type SplatData = z.infer<typeof splatDataSchema>;
 const gs3dDataSchema = objectDataSchema.extend({
   type: z.literal("gs3d"),
   src: z.string(),
+  antialiased: z.boolean().optional(),
 });
 
 export type GS3dData = z.infer<typeof gs3dDataSchema>;
