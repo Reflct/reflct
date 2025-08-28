@@ -441,6 +441,15 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
           newEntity.setLocalEulerAngles(euler.x, euler.y, euler.z);
 
           newEntity.setLocalScale(item.scale[0], item.scale[1], item.scale[2]);
+
+          if (item.type === "gs3d" && item.antialiased) {
+            newEntity.gsplat?.material?.defines.set("GSPLAT_AA", "1");
+            newEntity.gsplat?.material?.update();
+          } else {
+            newEntity.gsplat?.material?.defines.delete("GSPLAT_AA");
+            newEntity.gsplat?.material?.update();
+          }
+
           // Add to scene
           app.root.addChild(newEntity);
 
