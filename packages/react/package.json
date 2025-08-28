@@ -1,6 +1,6 @@
 {
   "name": "@reflct/react",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -43,7 +43,7 @@
     "react-dom": ">=16.8.0 <20.0.0"
   },
   "dependencies": {
-    "@reflct/api": "^2.0.0",
+    "@reflct/api": "^2.0.3",
     "gsap": "^3.13.0",
     "playcanvas": "^2.10.5"
   }
