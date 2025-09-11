@@ -45,6 +45,6 @@
   "dependencies": {
     "@reflct/api": "^2.0.3",
     "gsap": "^3.13.0",
-    "playcanvas": "^2.10.5"
+    "playcanvas": "^2.11.4"
   }
 }
