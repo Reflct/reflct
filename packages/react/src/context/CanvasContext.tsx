@@ -23,6 +23,7 @@ type CanvasContextActionsType = {
   getTransitionSpeedMultiplier: () => number;
   getAutomode: () => boolean;
   setAutomode: (automode: boolean) => void;
+  getAutoRotate: () => boolean;
   loadScene: (sceneId: string) => Promise<void>;
 };
 
@@ -33,6 +34,7 @@ type CanvasContextBaseType = {
   state?: number;
   transitionSpeedMultiplier: number;
   automodeTransitionSpeedMultiplier: number;
+  autoRotate: boolean;
 };
 
 export type CanvasContextEventsType = {
@@ -65,6 +67,7 @@ type CanvasContextType = CanvasContextBaseType & {
   currentViewGroup: SceneDto["data"]["transitionGroups"][0] | null;
   currentState: number;
   automode: boolean;
+  autoRotate: boolean;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   loadProgress: number;
@@ -88,6 +91,7 @@ export const CanvasContext = createContext<CanvasContextType>({
   currentViewGroup: null,
   currentState: 0,
   automode: false,
+  autoRotate: true,
   isLoading: false,
   setIsLoading: () => {},
   loadProgress: 0,
@@ -104,6 +108,7 @@ export const CanvasContext = createContext<CanvasContextType>({
       getTransitionSpeedMultiplier: () => 1,
       getAutomode: () => false,
       setAutomode: () => {},
+      getAutoRotate: () => false,
       loadScene: () => Promise.resolve(),
     },
   },
@@ -127,6 +132,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     isPreview,
     transitionSpeedMultiplier,
     automodeTransitionSpeedMultiplier,
+    autoRotate,
   } = value;
 
   const dataRef = useRef<{
@@ -146,6 +152,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     getAutomode: () => false,
     setAutomode: () => {},
     loadScene: () => Promise.resolve(),
+    getAutoRotate: () => false,
   });
 
   useEffect(() => {
@@ -243,6 +250,7 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     actionsRef.current.setAutomode = (automode: boolean) => {
       setAutomode(automode);
     };
+    actionsRef.current.getAutoRotate = () => autoRotate;
     actionsRef.current.loadScene = async (sceneId: string) => {
       setIsLoading(true);
       setLoadProgress(0);

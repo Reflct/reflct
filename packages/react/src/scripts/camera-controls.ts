@@ -73,7 +73,7 @@ export class CameraControlsScript extends PcScript {
   private lastAzimuthAngle: number = 0;
   private lastPolarAngle: number = 0;
   private angleChangeTime: number = 0;
-  private angleChangeThreshold: number = 3; // seconds to wait before changing direction
+  private angleChangeThreshold: number = 0; // seconds to wait before changing direction
   private autoRotateDuration: number = 15; // seconds to reach min/max angles
   private autoRotationMinMaxAzimuthAngle: number = Math.PI / 45; // radians to reach min/max angles
   private autoRotationMinMaxPolarAngle: number = Math.PI / 90; // radians to reach min/max angles
@@ -1064,14 +1064,14 @@ export class CameraControlsScript extends PcScript {
    */
   private calculateDynamicSpeeds(): void {
     // Calculate azimuth speed
-    let minAzimuth = Math.min(
-      this.minAzimuthAngle,
-      this.autoRotationMinMaxAzimuthAngle
-    );
-    let maxAzimuth = Math.min(
-      this.maxAzimuthAngle,
-      this.autoRotationMinMaxAzimuthAngle
-    );
+    let minAzimuth =
+      this.minAzimuthAngle === -Infinity
+        ? this.autoRotationMinMaxAzimuthAngle
+        : Math.min(this.minAzimuthAngle, this.autoRotationMinMaxAzimuthAngle);
+    let maxAzimuth =
+      this.maxAzimuthAngle === Infinity
+        ? this.autoRotationMinMaxAzimuthAngle
+        : Math.min(this.maxAzimuthAngle, this.autoRotationMinMaxAzimuthAngle);
 
     let azimuthRange = maxAzimuth + minAzimuth;
 

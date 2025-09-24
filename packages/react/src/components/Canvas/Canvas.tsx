@@ -132,6 +132,10 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
     );
     cameraControls.setIsLockedForOrbit(true);
 
+    if (!actionsRef.current.getAutoRotate()) {
+      cameraControls.setAutoRotate(false);
+    }
+
     cameraControls?.setCurrentAngleAsBaseAngle();
 
     cameraRef.current = {
@@ -301,9 +305,13 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
               targetView.item.maxAzimuthAngle ?? Infinity
             );
             cameraControls.setIsLockedForOrbit(true);
+            cameraControls.setHasUserInteracted(false);
 
             cameraControls?.setCurrentAngleAsBaseAngle();
             cameraControls.enableControls();
+            if (!actionsRef.current.getAutoRotate()) {
+              cameraControls.setAutoRotate(false);
+            }
 
             eventsRef.current.onStateChangeComplete?.(
               {

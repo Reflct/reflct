@@ -17,6 +17,7 @@ export type ViewerProps = {
   // camera
   transitionSpeedMultiplier?: number;
   automodeTransitionSpeedMultiplier?: number;
+  autoRotate?: boolean;
 
   // renders
   hitPoint?: HitPoint;
@@ -31,6 +32,7 @@ const Viewer: React.FC<ViewerProps> = ({
 
   transitionSpeedMultiplier = 1,
   automodeTransitionSpeedMultiplier = 0.5,
+  autoRotate = true,
 
   // events
   onLoadStart,
@@ -56,6 +58,7 @@ const Viewer: React.FC<ViewerProps> = ({
         isPreview,
         transitionSpeedMultiplier,
         automodeTransitionSpeedMultiplier,
+        autoRotate,
       }}
       events={{
         onLoadStart,
