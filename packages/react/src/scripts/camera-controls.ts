@@ -45,13 +45,13 @@ export class CameraControlsScript extends PcScript {
   private minAzimuthAngle: number = -Infinity;
   private maxAzimuthAngle: number = Infinity;
 
-  private minZoom: number = 0.5;
-  private maxZoom: number = 100;
+  private minZoom: number = 0.8;
+  private maxZoom: number = 1.2;
   private lerpFactor: number = 0.1;
   private panSpeed: number = 0.01;
   private zoomSpeed: number = 0.1;
 
-  private wheelZoomSpeed: number = 0.005;
+  private wheelZoomSpeed: number = 0.001;
   private dragRotationSpeed: number = 0.002;
 
   private arrowPanSpeed: number = 20;
@@ -59,7 +59,7 @@ export class CameraControlsScript extends PcScript {
   private focused: boolean = false;
 
   private controlsDisabled: boolean = false;
-  private zoomDisabled: boolean = true;
+  private zoomDisabled: boolean = false;
   private panDisabled: boolean = true;
   private rotateDisabled: boolean = false;
 
@@ -819,6 +819,22 @@ export class CameraControlsScript extends PcScript {
    */
   setTargetZoom(zoom: number): void {
     this.target.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, zoom));
+  }
+
+  getMinZoom(): number {
+    return this.minZoom;
+  }
+
+  getMaxZoom(): number {
+    return this.maxZoom;
+  }
+
+  setMinZoom(minZoom: number): void {
+    this.minZoom = minZoom;
+  }
+
+  setMaxZoom(maxZoom: number): void {
+    this.maxZoom = maxZoom;
   }
 
   /**
