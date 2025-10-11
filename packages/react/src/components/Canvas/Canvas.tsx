@@ -123,6 +123,12 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
       zoom: firstTransition.zoom,
     });
 
+    if (firstTransition.zoomEnabled) {
+      cameraControls.enableZoom();
+    } else {
+      cameraControls.disableZoom();
+    }
+
     cameraControls.setMinZoom(
       firstTransition.zoom - (firstTransition.minZoomOffset ?? 0.2)
     );
@@ -308,6 +314,12 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
             cameraControls.setMaxZoom(
               targetView.item.zoom + (targetView.item.maxZoomOffset ?? 0.5)
             );
+
+            if (targetView.item.zoomEnabled) {
+              cameraControls.enableZoom();
+            } else {
+              cameraControls.disableZoom();
+            }
 
             cameraControls.setMinPolarAngle(targetView.item.minPolarAngle ?? 0);
             cameraControls.setMaxPolarAngle(

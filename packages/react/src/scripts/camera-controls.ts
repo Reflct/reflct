@@ -940,6 +940,14 @@ export class CameraControlsScript extends PcScript {
     }
   }
 
+  disableZoom(): void {
+    this.zoomDisabled = true;
+  }
+
+  enableZoom(): void {
+    this.zoomDisabled = false;
+  }
+
   /**
    * Check if controls are currently disabled
    */
