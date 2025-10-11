@@ -818,6 +818,12 @@ export class CameraControlsScript extends PcScript {
    * @param zoom The target zoom value
    */
   setTargetZoom(zoom: number): void {
+    if (this.controlsDisabled || this.zoomDisabled) {
+      this.target.zoom = zoom;
+
+      return;
+    }
+
     this.target.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, zoom));
   }
 
