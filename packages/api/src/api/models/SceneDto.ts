@@ -58,6 +58,7 @@ const perspectiveCameraDataSchema = cameraDataSchema.extend({
   far: z.number(),
   minZoomOffset: z.number().optional(),
   maxZoomOffset: z.number().optional(),
+  zoomEnabled: z.boolean(),
   maxAzimuthAngle: z.union([z.number(), z.null()]),
   minAzimuthAngle: z.union([z.number(), z.null()]),
   maxPolarAngle: z.union([z.number(), z.null()]),
