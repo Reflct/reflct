@@ -269,6 +269,6 @@ If you wish to customise the UI of the hitpoints, you can do that by giving the 
 
 See license in [LICENSE](./LICENSE)
 
-## Authors
+## Author(s)
 
 - In Ha Ryu <inha.ryu.97@gmail.com>
