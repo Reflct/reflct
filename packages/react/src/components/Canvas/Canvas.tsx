@@ -122,6 +122,20 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
       ),
       zoom: firstTransition.zoom,
     });
+
+    if (firstTransition.zoomEnabled) {
+      cameraControls.enableZoom();
+    } else {
+      cameraControls.disableZoom();
+    }
+
+    cameraControls.setMinZoom(
+      firstTransition.zoom - (firstTransition.minZoomOffset ?? 0.2)
+    );
+    cameraControls.setMaxZoom(
+      firstTransition.zoom + (firstTransition.maxZoomOffset ?? 0.5)
+    );
+
     cameraControls.setMinPolarAngle(firstTransition.minPolarAngle ?? Math.PI);
     cameraControls.setMaxPolarAngle(firstTransition.maxPolarAngle ?? Math.PI);
     cameraControls.setMinAzimuthAngle(
@@ -293,6 +307,19 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
           },
           onComplete: () => {
             isTransitioningRef.current = false;
+
+            cameraControls.setMinZoom(
+              targetView.item.zoom - (targetView.item.minZoomOffset ?? 0.2)
+            );
+            cameraControls.setMaxZoom(
+              targetView.item.zoom + (targetView.item.maxZoomOffset ?? 0.5)
+            );
+
+            if (targetView.item.zoomEnabled) {
+              cameraControls.enableZoom();
+            } else {
+              cameraControls.disableZoom();
+            }
 
             cameraControls.setMinPolarAngle(targetView.item.minPolarAngle ?? 0);
             cameraControls.setMaxPolarAngle(

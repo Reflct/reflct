@@ -45,13 +45,13 @@ export class CameraControlsScript extends PcScript {
   private minAzimuthAngle: number = -Infinity;
   private maxAzimuthAngle: number = Infinity;
 
-  private minZoom: number = 0.5;
-  private maxZoom: number = 100;
+  private minZoom: number = 0.8;
+  private maxZoom: number = 1.2;
   private lerpFactor: number = 0.1;
   private panSpeed: number = 0.01;
   private zoomSpeed: number = 0.1;
 
-  private wheelZoomSpeed: number = 0.005;
+  private wheelZoomSpeed: number = 0.001;
   private dragRotationSpeed: number = 0.002;
 
   private arrowPanSpeed: number = 20;
@@ -59,7 +59,7 @@ export class CameraControlsScript extends PcScript {
   private focused: boolean = false;
 
   private controlsDisabled: boolean = false;
-  private zoomDisabled: boolean = true;
+  private zoomDisabled: boolean = false;
   private panDisabled: boolean = true;
   private rotateDisabled: boolean = false;
 
@@ -90,6 +90,12 @@ export class CameraControlsScript extends PcScript {
   private touchStartHandler: (event: TouchEvent) => void = () => {};
   private touchMoveHandler: (event: TouchEvent) => void = () => {};
   private touchEndHandler: (event: TouchEvent) => void = () => {};
+
+  // Touch state for pinch zoom
+  private touches: Touch[] = [];
+  private initialPinchDistance: number = 0;
+  private initialPinchZoom: number = 1;
+  private initialPinchDistance2: number = 0;
 
   // Event system properties
   private eventListeners: Map<string, Set<(data: any) => void>> = new Map();
@@ -432,34 +438,106 @@ export class CameraControlsScript extends PcScript {
 
     if (this.controlsDisabled) return;
 
-    this.isMouseDown = true;
+    this.touches = Array.from(event.touches);
     this.userHasInteracted = true;
     this.autoRotate = false;
 
-    this.isDragging = true;
-    this.lastX = event.touches[0].clientX;
-    this.lastY = event.touches[0].clientY;
-    this.mouseDownX = event.touches[0].clientX;
-    this.mouseDownY = event.touches[0].clientY;
-    this.hasMoved = false;
+    if (this.touches.length === 2) {
+      // Two-finger pinch zoom
+      const dx = this.touches[0].clientX - this.touches[1].clientX;
+      const dy = this.touches[0].clientY - this.touches[1].clientY;
+      this.initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+
+      // Store initial distance for camera distance adjustment
+      this.initialPinchDistance2 = this.target.distance;
+
+      // Store initial zoom
+      this.initialPinchZoom = this.target.zoom;
+
+      // Reset dragging state when starting pinch
+      this.isDragging = false;
+      this.isMouseDown = false;
+    } else if (this.touches.length === 1) {
+      // Single finger - prepare for rotation
+      this.isMouseDown = true;
+      this.isDragging = true;
+      this.lastX = this.touches[0].clientX;
+      this.lastY = this.touches[0].clientY;
+      this.mouseDownX = this.touches[0].clientX;
+      this.mouseDownY = this.touches[0].clientY;
+      this.hasMoved = false;
+    }
   }
 
   private onTouchMove(event: TouchEvent) {
     event.preventDefault();
 
-    this.onInteractionMove({
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY,
-    });
+    this.touches = Array.from(event.touches);
+
+    if (this.touches.length === 2) {
+      // Two-finger pinch zoom
+      const dx = this.touches[0].clientX - this.touches[1].clientX;
+      const dy = this.touches[0].clientY - this.touches[1].clientY;
+      const currentDistance = Math.sqrt(dx * dx + dy * dy);
+
+      if (this.initialPinchDistance > 0 && !this.zoomDisabled) {
+        const scale = currentDistance / this.initialPinchDistance;
+
+        // Apply pinch zoom - adjust zoom level
+        const newZoom = this.initialPinchZoom * scale;
+        this.target.zoom = Math.max(
+          this.minZoom,
+          Math.min(this.maxZoom, newZoom)
+        );
+      }
+    } else if (this.touches.length === 1 && this.isDragging) {
+      // Single finger drag - rotate camera
+      this.onInteractionMove({
+        x: this.touches[0].clientX,
+        y: this.touches[0].clientY,
+      });
+    }
   }
 
   private onTouchEnd(event: TouchEvent) {
     event.preventDefault();
 
-    this.onInteractionEnd({
-      x: this.lastX,
-      y: this.lastY,
-    });
+    this.touches = Array.from(event.touches);
+
+    if (this.touches.length === 0) {
+      // All fingers lifted
+      this.isDragging = false;
+      this.isPanning = false;
+      this.initialPinchDistance = 0;
+      this.initialPinchDistance2 = 0;
+      this.initialPinchZoom = 1;
+
+      // Handle tap to focus on splat
+      if (
+        !this.hasMoved &&
+        !this.isLockedForOrbit &&
+        event.changedTouches.length > 0
+      ) {
+        const touch = event.changedTouches[0];
+        this.onInteractionEnd({
+          x: touch.clientX,
+          y: touch.clientY,
+        });
+      } else {
+        this.isMouseDown = false;
+      }
+
+      this.hasMoved = false;
+    } else if (this.touches.length === 1) {
+      // One finger remaining, reset to single touch mode
+      this.initialPinchDistance = 0;
+      this.initialPinchDistance2 = 0;
+      this.initialPinchZoom = 1;
+      this.lastX = this.touches[0].clientX;
+      this.lastY = this.touches[0].clientY;
+      this.isDragging = true;
+      this.isMouseDown = true;
+    }
   }
 
   private onInteractionMove(value: { x: number; y: number }) {
@@ -818,7 +896,29 @@ export class CameraControlsScript extends PcScript {
    * @param zoom The target zoom value
    */
   setTargetZoom(zoom: number): void {
+    if (this.controlsDisabled || this.zoomDisabled) {
+      this.target.zoom = zoom;
+
+      return;
+    }
+
     this.target.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, zoom));
+  }
+
+  getMinZoom(): number {
+    return this.minZoom;
+  }
+
+  getMaxZoom(): number {
+    return this.maxZoom;
+  }
+
+  setMinZoom(minZoom: number): void {
+    this.minZoom = minZoom;
+  }
+
+  setMaxZoom(maxZoom: number): void {
+    this.maxZoom = maxZoom;
   }
 
   /**
@@ -916,6 +1016,14 @@ export class CameraControlsScript extends PcScript {
     if (!this.userHasInteracted) {
       this.autoRotate = true;
     }
+  }
+
+  disableZoom(): void {
+    this.zoomDisabled = true;
+  }
+
+  enableZoom(): void {
+    this.zoomDisabled = false;
   }
 
   /**
