@@ -21,7 +21,7 @@
     "@playwright/test": "^1.49.1",
     "@rollup/plugin-babel": "^6.0.4",
     "@types/node": "^22.10.2",
-    "lerna": "^8.1.9",
+    "lerna": "^9.0.3",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3"
   },
