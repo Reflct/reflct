@@ -222,7 +222,7 @@ If you wish to customise the UIs of the viewer component, you can do those by gi
     linkedScenes,
     loadScene,
   }) => {
-    return <div>Controls {/* what ever you want to render */}</div>;
+    return <div>Controls {/* whatever you want to render */}</div>;
   }}
 </Viewer>
 ```
