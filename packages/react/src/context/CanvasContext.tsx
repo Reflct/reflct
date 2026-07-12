@@ -151,8 +151,8 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
     getTransitionSpeedMultiplier: () => 1,
     getAutomode: () => false,
     setAutomode: () => {},
+    getAutoRotate: () => true,
     loadScene: () => Promise.resolve(),
-    getAutoRotate: () => false,
   });
 
   useEffect(() => {
@@ -202,8 +202,6 @@ export const CanvasContextProvider: React.FC<CanvasContextProviderProps> = ({
           response.data.transitionGroups.flatMap((group) => group.transitions)
         );
       } catch (error) {
-        console.error(error);
-
         if (error instanceof ReflctApiError) {
           setError(error);
         } else {

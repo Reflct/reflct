@@ -41,7 +41,7 @@ const UI: React.FC<Props> = ({ ui }) => {
   } = useCanvasContext();
 
   if (ui) {
-    const currentTransition = views.at(currentState);
+    const currentTransition = views[currentState];
     const currentTransitionGroup = sceneData?.data.transitionGroups?.find(
       (group) => group.transitions.find((x) => x.id === currentTransition?.id)
     );
@@ -62,6 +62,7 @@ const UI: React.FC<Props> = ({ ui }) => {
       actionsRef.current.setState(currentState - 1);
     };
 
+    // eslint-disable-next-line react-hooks/refs
     return ui({
       index: currentState,
       currentView: {
@@ -91,12 +92,12 @@ const UI: React.FC<Props> = ({ ui }) => {
         linkedScenes: sceneData?.linkedScenes ?? [],
       },
       automode,
-      setAutomode: actionsRef.current.setAutomode,
+      setAutomode: (automode: boolean) => actionsRef.current.setAutomode(automode),
       isLoading,
       loadProgress,
       nextView,
       prevView,
-      loadScene: actionsRef.current.loadScene,
+      loadScene: (sceneId: string) => actionsRef.current.loadScene(sceneId),
     });
   }
 

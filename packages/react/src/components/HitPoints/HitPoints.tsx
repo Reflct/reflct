@@ -80,13 +80,14 @@ const HitPoints: React.FC<{ hitPoint?: HitPoint }> = ({ hitPoint }) => {
   if (hitPoint) {
     return (
       <>
+        {/* eslint-disable-next-line react-hooks/refs */}
         {sceneData?.data.transitionGroups.flatMap((group) => {
           const inCurrentGroup = Boolean(
             group.transitions.find((x) => x.id === currentView?.id)
           );
 
           return group.transitions.map((transition) => {
-            const { id, item: transitionItem, showHitPoint } = transition;
+            const { id, showHitPoint } = transition;
 
             const index = views.findIndex((x) => x.id === id);
             const isSelected = id === currentView?.id;
@@ -129,9 +130,7 @@ const HitPoints: React.FC<{ hitPoint?: HitPoint }> = ({ hitPoint }) => {
         return (
           <HitPointWrapper transition={transition} key={id}>
             <button
-              className={`${styles["hit-point"]} ${
-                isSelected ? styles["selected"] : ""
-              }`}
+              className={`${styles["hit-point"]} ${isSelected ? styles["selected"] : ""}`}
               onClick={() => {
                 if (automode) {
                   return;
