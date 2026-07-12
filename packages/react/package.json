@@ -15,6 +15,11 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Reflct/reflct.git",
+    "directory": "packages/react"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && vite build",

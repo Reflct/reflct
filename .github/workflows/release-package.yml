@@ -5,29 +5,30 @@ on:
     tags:
       - "v*.*.*" # Triggers when a new tag is pushed
 
+permissions:
+  id-token: write # Required for npm OIDC trusted publishing
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch all history and tags
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org/"
-          cache: "npm"
 
-      - name: Verify npm authentication
-        run: npm whoami
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Ensure recent npm
+        run: npm install -g npm@latest
 
       - name: Install dependencies
-        run: npm install --no-save
+        run: npm ci
 
       - name: Build packages
         env:
@@ -35,6 +36,5 @@ jobs:
         run: npx lerna run build
 
       - name: Publish packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # Publishes via OIDC trusted publishing — no NPM_TOKEN needed
         run: npx lerna publish from-git --yes
