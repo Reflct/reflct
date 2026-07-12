@@ -20,8 +20,15 @@ export const getCameraInstance = (name: string) => {
 };
 
 export class CameraControlsScript extends PcScript {
+  private static readonly MAX_SPLAT_PICK_SAMPLES = 16384;
+
   private canvas!: HTMLCanvasElement;
   private keyboard!: Keyboard;
+
+  private _pickRayDir = new Vec3();
+  private _pickLocalPos = new Vec3();
+  private _pickWorldPos = new Vec3();
+  private _pickResult = new Vec3();
 
   private isMouseDown: boolean = false;
   private isDragging: boolean = false;
@@ -182,6 +189,8 @@ export class CameraControlsScript extends PcScript {
     this.autoRotatePolarDirection = Math.random() > 0.5 ? 1 : -1;
 
     cameraInstances.set(this.entity.name, this);
+
+    this.requestRender();
   }
 
   destroy() {
@@ -359,6 +368,33 @@ export class CameraControlsScript extends PcScript {
     );
   }
 
+  private requestRender(): void {
+    this.app.renderNextFrame = true;
+  }
+
+  private isCameraAnimating(): boolean {
+    const epsilon = 0.001;
+
+    if (Math.abs(this.real.zoom - this.target.zoom) > epsilon) return true;
+    if (Math.abs(this.real.polarAngle - this.target.polarAngle) > epsilon)
+      return true;
+    if (Math.abs(this.real.azimuthAngle - this.target.azimuthAngle) > epsilon)
+      return true;
+    if (Math.abs(this.real.distance - this.target.distance) > epsilon)
+      return true;
+    if (!this.vec3Equals(this.real.lookat, this.target.lookat)) return true;
+
+    return false;
+  }
+
+  private shouldRenderThisFrame(): boolean {
+    return (
+      this.isCameraAnimating() ||
+      (this.isMouseDown && (this.isDragging || this.isPanning)) ||
+      (this.autoRotate && !this.userHasInteracted && !this.controlsDisabled)
+    );
+  }
+
   private onWindowClick(event: MouseEvent) {
     try {
       if (this.app.graphicsDevice.canvas.contains(event.target as Node)) {
@@ -385,6 +421,7 @@ export class CameraControlsScript extends PcScript {
     );
 
     event.preventDefault();
+    this.requestRender();
   }
 
   private onMouseDown(event: MouseEvent) {
@@ -426,7 +463,7 @@ export class CameraControlsScript extends PcScript {
   private onMouseUp(event: MouseEvent) {
     event.preventDefault();
 
-    this.onInteractionEnd({ x: event.x, y: event.y });
+    this.onInteractionEnd({ x: event.clientX, y: event.clientY });
   }
 
   private onContextMenu(event: MouseEvent) {
@@ -497,6 +534,8 @@ export class CameraControlsScript extends PcScript {
         y: this.touches[0].clientY,
       });
     }
+
+    this.requestRender();
   }
 
   private onTouchEnd(event: TouchEvent) {
@@ -538,6 +577,8 @@ export class CameraControlsScript extends PcScript {
       this.isDragging = true;
       this.isMouseDown = true;
     }
+
+    this.requestRender();
   }
 
   private onInteractionMove(value: { x: number; y: number }) {
@@ -586,6 +627,8 @@ export class CameraControlsScript extends PcScript {
     ) {
       this.hasMoved = true;
     }
+
+    this.requestRender();
   }
 
   private onInteractionEnd(value: { x: number; y: number }) {
@@ -598,40 +641,37 @@ export class CameraControlsScript extends PcScript {
     if (this.isLockedForOrbit) return;
 
     if (!this.hasMoved) {
-      const rect = this.canvas.getBoundingClientRect();
-
-      const closestPosition = this.selectSplat({
-        x: value.x - rect.left,
-        y: value.y - rect.top,
-      });
-
-      if (closestPosition) {
-        // Calculate the direction from current camera position to the closest position
-        const direction = new pc.Vec3();
-        direction.sub2(this.entity.getPosition(), closestPosition).normalize();
-
-        // Calculate azimuth angle (horizontal angle around Y-axis)
-        const newAzimuthAngle =
-          (Math.atan2(direction.x, direction.z) - Math.PI / 2) % (2 * Math.PI);
-
-        this.target.azimuthAngle = this.getShortestPathAzimuthAngle(
-          this.real.azimuthAngle,
-          newAzimuthAngle
-        );
-
-        // Calculate polar angle (vertical angle from Y-axis)
-        this.target.polarAngle = Math.acos(direction.y) % Math.PI;
-
-        // Calculate the distance from the camera to the closest position
-        const distance = this.entity.getPosition().distance(closestPosition);
-        this.target.distance = distance;
-
-        // Update lookat to the closest position
-        this.target.lookat.copy(closestPosition);
-      }
+      this.focusCameraOnScreenPosition(value.x, value.y);
     }
 
     this.hasMoved = false;
+    this.requestRender();
+  }
+
+  private focusCameraOnScreenPosition(clientX: number, clientY: number): void {
+    const rect = this.canvas.getBoundingClientRect();
+    const closestPosition = this.selectSplat({
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    });
+
+    if (!closestPosition) return;
+
+    const direction = new pc.Vec3();
+    direction.sub2(this.entity.getPosition(), closestPosition).normalize();
+
+    const newAzimuthAngle =
+      (Math.atan2(direction.x, direction.z) - Math.PI / 2) % (2 * Math.PI);
+
+    this.target.azimuthAngle = this.getShortestPathAzimuthAngle(
+      this.real.azimuthAngle,
+      newAzimuthAngle
+    );
+    this.target.polarAngle = Math.acos(direction.y) % Math.PI;
+    this.target.distance = this.entity.getPosition().distance(closestPosition);
+    this.target.lookat.copy(closestPosition);
+
+    this.requestRender();
   }
 
   private selectSplat({ x, y }: { x: number; y: number }): pc.Vec3 | null {
@@ -644,68 +684,70 @@ export class CameraControlsScript extends PcScript {
       this.entity.camera.farClip
     );
 
-    let closestDist = Infinity;
-    let closestPosition: pc.Vec3 | null = null;
+    this._pickRayDir.sub2(to, from).normalize();
+
+    const fromX = from.x;
+    const fromY = from.y;
+    const fromZ = from.z;
+    const rdx = this._pickRayDir.x;
+    const rdy = this._pickRayDir.y;
+    const rdz = this._pickRayDir.z;
+
+    let closestDistSq = Infinity;
+    let hasClosest = false;
 
     const components = this.app.root.findComponents("gsplat");
-    components.forEach((component) => {
+    for (const component of components) {
       const gsplatComponent = component as pc.GSplatComponent;
+      const resource = gsplatComponent.resource;
 
-      if (!gsplatComponent.instance?.resource) return;
+      if (!resource?.centers) continue;
 
-      const { centers } = gsplatComponent.instance?.resource;
-
+      const { centers } = resource;
+      const numSplats = resource.numSplats;
+      const step = Math.max(
+        1,
+        Math.ceil(numSplats / CameraControlsScript.MAX_SPLAT_PICK_SAMPLES)
+      );
       const worldTransform = gsplatComponent.entity.getWorldTransform();
 
-      for (let i = 0; i < gsplatComponent.instance?.resource.numSplats; i++) {
-        const pos = new pc.Vec3(
+      for (let i = 0; i < numSplats; i += step) {
+        this._pickLocalPos.set(
           centers[i * 3],
           centers[i * 3 + 1],
           centers[i * 3 + 2]
         );
+        worldTransform.transformPoint(this._pickLocalPos, this._pickWorldPos);
 
-        // Apply world transform to get the updated position in world space
-        const worldPos = new pc.Vec3();
-        worldTransform.transformPoint(pos, worldPos);
+        const wx = this._pickWorldPos.x;
+        const wy = this._pickWorldPos.y;
+        const wz = this._pickWorldPos.z;
 
-        // Calculate the distance between the ray and the sphere center
-        const distance = this.rayToSphereDistance(from, to, worldPos);
+        const tsx = wx - fromX;
+        const tsy = wy - fromY;
+        const tsz = wz - fromZ;
+        const projectionLength = tsx * rdx + tsy * rdy + tsz * rdz;
 
-        if (distance < closestDist) {
-          // New closest splat found, reset aggregation
-          closestDist = distance;
-          closestPosition = worldPos.clone();
+        if (projectionLength <= 0) continue;
+
+        const cx = fromX + rdx * projectionLength;
+        const cy = fromY + rdy * projectionLength;
+        const cz = fromZ + rdz * projectionLength;
+
+        const dx = wx - cx;
+        const dy = wy - cy;
+        const dz = wz - cz;
+        const distSq = dx * dx + dy * dy + dz * dz;
+
+        if (distSq < closestDistSq) {
+          closestDistSq = distSq;
+          this._pickResult.set(wx, wy, wz);
+          hasClosest = true;
         }
       }
-    });
+    }
 
-    return closestPosition;
-  }
-
-  private rayToSphereDistance(
-    from: pc.Vec3,
-    to: pc.Vec3,
-    sphereCenter: pc.Vec3
-  ): number {
-    // Calculate the ray direction
-    const rayDirection = new pc.Vec3();
-    rayDirection.sub2(to, from).normalize();
-
-    // Vector from ray origin to sphere center
-    const toSphere = new pc.Vec3();
-    toSphere.sub2(sphereCenter, from);
-
-    // Project the vector from ray origin to sphere center onto the ray direction
-    const projectionLength = toSphere.dot(rayDirection);
-
-    // Find the closest point on the ray to the sphere center
-    const closestPointOnRay = new pc.Vec3();
-    closestPointOnRay.copy(rayDirection).mulScalar(projectionLength).add(from);
-
-    // Calculate the distance from the sphere center to the closest point on the ray
-    const distance = closestPointOnRay.distance(sphereCenter);
-
-    return distance;
+    return hasClosest ? this._pickResult.clone() : null;
   }
 
   /**
@@ -948,6 +990,9 @@ export class CameraControlsScript extends PcScript {
     this.real.azimuthAngle = this.target.azimuthAngle;
     this.real.lookat.copy(this.target.lookat);
     this.real.zoom = this.target.zoom;
+
+    this.updateCameraPosition();
+    this.requestRender();
   }
 
   /**
@@ -982,16 +1027,25 @@ export class CameraControlsScript extends PcScript {
     this.real.azimuthAngle = this.target.azimuthAngle;
     this.real.lookat.copy(this.target.lookat);
     this.real.zoom = this.target.zoom;
+
+    this.updateCameraPosition();
+    this.requestRender();
   }
 
   setLookAt(lookAt: Vec3): void {
     this.setTargetLookAt(lookAt);
     this.real.lookat.copy(this.target.lookat);
+
+    this.updateCameraPosition();
+    this.requestRender();
   }
 
   setZoom(zoom: number): void {
     this.setTargetZoom(zoom);
     this.real.zoom = this.target.zoom;
+
+    this.updateCameraPosition();
+    this.requestRender();
   }
 
   /**
@@ -1172,28 +1226,28 @@ export class CameraControlsScript extends PcScript {
    */
   private calculateDynamicSpeeds(): void {
     // Calculate azimuth speed
-    let minAzimuth =
+    const minAzimuth =
       this.minAzimuthAngle === -Infinity
         ? this.autoRotationMinMaxAzimuthAngle
         : Math.min(this.minAzimuthAngle, this.autoRotationMinMaxAzimuthAngle);
-    let maxAzimuth =
+    const maxAzimuth =
       this.maxAzimuthAngle === Infinity
         ? this.autoRotationMinMaxAzimuthAngle
         : Math.min(this.maxAzimuthAngle, this.autoRotationMinMaxAzimuthAngle);
 
-    let azimuthRange = maxAzimuth + minAzimuth;
+    const azimuthRange = maxAzimuth + minAzimuth;
 
     // Calculate polar speed
-    let minPolar = Math.min(
+    const minPolar = Math.min(
       this.minPolarAngle,
       this.autoRotationMinMaxPolarAngle
     );
-    let maxPolar = Math.min(
+    const maxPolar = Math.min(
       this.maxPolarAngle,
       this.autoRotationMinMaxPolarAngle
     );
 
-    let polarRange = maxPolar + minPolar;
+    const polarRange = maxPolar + minPolar;
 
     // Calculate speeds to reach boundaries in autoRotateDuration seconds
     this.autoRotateSpeed = azimuthRange / this.autoRotateDuration;
@@ -1379,5 +1433,9 @@ export class CameraControlsScript extends PcScript {
 
     // Check and emit camera events
     this.checkAndEmitCameraEvents();
+
+    if (this.shouldRenderThisFrame()) {
+      this.requestRender();
+    }
   }
 }
