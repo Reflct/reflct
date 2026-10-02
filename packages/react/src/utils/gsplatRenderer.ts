@@ -155,7 +155,6 @@ export class HdrLinearCameraPath {
       name: "viewerHdrMain",
       colorBuffer,
       depthBuffer,
-      flipY: false,
     });
 
     // Swap before destroying so the camera never briefly has no target (blank frame).

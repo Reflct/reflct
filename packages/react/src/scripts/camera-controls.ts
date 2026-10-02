@@ -1,6 +1,6 @@
 // Camera controls to implement
 import * as pc from "playcanvas";
-import { Keyboard, Mouse, Script as PcScript, Vec3 } from "playcanvas";
+import { Keyboard, Script as PcScript, Vec3 } from "playcanvas";
 
 // TODO: we can set the base azimuthAngle.
 // this will upate getShortestPathAzimuthAngle to be relative to the base azimuthAngle
@@ -217,7 +217,7 @@ export class CameraControlsScript extends PcScript {
    */
   addCameraEventListener<T extends keyof CameraEvents>(
     eventName: T,
-    callback: (data: CameraEvents[T]) => void
+    callback: (data: CameraEvents[T]) => void,
   ): void {
     if (!this.eventListeners.has(eventName)) {
       this.eventListeners.set(eventName, new Set());
@@ -232,7 +232,7 @@ export class CameraControlsScript extends PcScript {
    */
   removeCameraEventListener<T extends keyof CameraEvents>(
     eventName: T,
-    callback: (data: CameraEvents[T]) => void
+    callback: (data: CameraEvents[T]) => void,
   ): void {
     const listeners = this.eventListeners.get(eventName);
     if (listeners) {
@@ -276,21 +276,21 @@ export class CameraControlsScript extends PcScript {
 
     const hasTargetPositionChanged = !this.vec3Equals(
       currentTargetPosition,
-      this.lastEmittedValues.targetPosition
+      this.lastEmittedValues.targetPosition,
     );
     const hasTargetLookAtChanged = !this.vec3Equals(
       currentTargetLookAt,
-      this.lastEmittedValues.targetLookAt
+      this.lastEmittedValues.targetLookAt,
     );
     const hasTargetZoomChanged =
       Math.abs(currentTargetZoom - this.lastEmittedValues.targetZoom) > 0.001;
     const hasPositionChanged = !this.vec3Equals(
       currentPosition,
-      this.lastEmittedValues.position
+      this.lastEmittedValues.position,
     );
     const hasLookAtChanged = !this.vec3Equals(
       currentLookAt,
-      this.lastEmittedValues.lookAt
+      this.lastEmittedValues.lookAt,
     );
     const hasZoomChanged =
       Math.abs(currentZoom - this.lastEmittedValues.zoom) > 0.001;
@@ -402,7 +402,9 @@ export class CameraControlsScript extends PcScript {
       } else {
         this.focused = false;
       }
-    } catch {}
+    } catch {
+      //
+    }
   }
 
   private onMouseWheel(event: WheelEvent) {
@@ -417,7 +419,7 @@ export class CameraControlsScript extends PcScript {
     const delta = event.deltaY * this.wheelZoomSpeed;
     this.target.zoom = Math.max(
       this.minZoom,
-      Math.min(this.maxZoom, this.target.zoom - delta)
+      Math.min(this.maxZoom, this.target.zoom - delta),
     );
 
     event.preventDefault();
@@ -524,7 +526,7 @@ export class CameraControlsScript extends PcScript {
         const newZoom = this.initialPinchZoom * scale;
         this.target.zoom = Math.max(
           this.minZoom,
-          Math.min(this.maxZoom, newZoom)
+          Math.min(this.maxZoom, newZoom),
         );
       }
     } else if (this.touches.length === 1 && this.isDragging) {
@@ -665,7 +667,7 @@ export class CameraControlsScript extends PcScript {
 
     this.target.azimuthAngle = this.getShortestPathAzimuthAngle(
       this.real.azimuthAngle,
-      newAzimuthAngle
+      newAzimuthAngle,
     );
     this.target.polarAngle = Math.acos(direction.y) % Math.PI;
     this.target.distance = this.entity.getPosition().distance(closestPosition);
@@ -681,7 +683,7 @@ export class CameraControlsScript extends PcScript {
     const to = this.entity.camera.screenToWorld(
       x,
       y,
-      this.entity.camera.farClip
+      this.entity.camera.farClip,
     );
 
     this._pickRayDir.sub2(to, from).normalize();
@@ -707,7 +709,7 @@ export class CameraControlsScript extends PcScript {
       const numSplats = resource.numSplats;
       const step = Math.max(
         1,
-        Math.ceil(numSplats / CameraControlsScript.MAX_SPLAT_PICK_SAMPLES)
+        Math.ceil(numSplats / CameraControlsScript.MAX_SPLAT_PICK_SAMPLES),
       );
       const worldTransform = gsplatComponent.entity.getWorldTransform();
 
@@ -715,7 +717,7 @@ export class CameraControlsScript extends PcScript {
         this._pickLocalPos.set(
           centers[i * 3],
           centers[i * 3 + 1],
-          centers[i * 3 + 2]
+          centers[i * 3 + 2],
         );
         worldTransform.transformPoint(this._pickLocalPos, this._pickWorldPos);
 
@@ -813,7 +815,7 @@ export class CameraControlsScript extends PcScript {
     this.entity.lookAt(
       this.real.lookat.x,
       this.real.lookat.y,
-      this.real.lookat.z
+      this.real.lookat.z,
     );
 
     // Update camera zoom
@@ -887,7 +889,7 @@ export class CameraControlsScript extends PcScript {
     // Update target values
     this.target.distance = Math.max(
       this.minDistance,
-      Math.min(this.maxDistance, distance)
+      Math.min(this.maxDistance, distance),
     );
     this.target.polarAngle = polarAngle;
     this.target.azimuthAngle = azimuthAngle;
@@ -923,7 +925,7 @@ export class CameraControlsScript extends PcScript {
     // Update target values to maintain the same position
     this.target.distance = Math.max(
       this.minDistance,
-      Math.min(this.maxDistance, distance)
+      Math.min(this.maxDistance, distance),
     );
 
     this.target.polarAngle = polarAngle;
@@ -1100,7 +1102,7 @@ export class CameraControlsScript extends PcScript {
   rotateAroundLookAt(
     azimuthDelta: number = 0,
     polarDelta: number = 0,
-    clamp: boolean = false
+    clamp: boolean = false,
   ): void {
     // Apply rotation deltas
     this.target.azimuthAngle = this.baseAzimuthAngle + azimuthDelta;
@@ -1240,11 +1242,11 @@ export class CameraControlsScript extends PcScript {
     // Calculate polar speed
     const minPolar = Math.min(
       this.minPolarAngle,
-      this.autoRotationMinMaxPolarAngle
+      this.autoRotationMinMaxPolarAngle,
     );
     const maxPolar = Math.min(
       this.maxPolarAngle,
-      this.autoRotationMinMaxPolarAngle
+      this.autoRotationMinMaxPolarAngle,
     );
 
     const polarRange = maxPolar + minPolar;
@@ -1259,13 +1261,13 @@ export class CameraControlsScript extends PcScript {
       if (this.minAzimuthAngle !== -Infinity) {
         this.target.azimuthAngle = Math.max(
           this.baseAzimuthAngle - this.minAzimuthAngle,
-          this.target.azimuthAngle
+          this.target.azimuthAngle,
         );
       }
       if (this.maxAzimuthAngle !== Infinity) {
         this.target.azimuthAngle = Math.min(
           this.baseAzimuthAngle + this.maxAzimuthAngle,
-          this.target.azimuthAngle
+          this.target.azimuthAngle,
         );
       }
     }
@@ -1276,12 +1278,12 @@ export class CameraControlsScript extends PcScript {
       this.target.polarAngle = Math.max(
         this.basePolarAngle - this.minPolarAngle,
         0,
-        this.target.polarAngle
+        this.target.polarAngle,
       );
       this.target.polarAngle = Math.min(
         this.basePolarAngle + this.maxPolarAngle,
         Math.PI,
-        this.target.polarAngle
+        this.target.polarAngle,
       );
     } else {
       this.target.polarAngle = Math.max(0, this.target.polarAngle);
@@ -1325,48 +1327,48 @@ export class CameraControlsScript extends PcScript {
       if (this.minAzimuthAngle !== -Infinity) {
         newAzimuthAngle = Math.max(
           this.baseAzimuthAngle - this.minAzimuthAngle,
-          newAzimuthAngle
+          newAzimuthAngle,
         );
       }
 
       newAzimuthAngle = Math.max(
         this.baseAzimuthAngle - this.autoRotationMinMaxAzimuthAngle,
-        newAzimuthAngle
+        newAzimuthAngle,
       );
 
       if (this.maxAzimuthAngle !== Infinity) {
         newAzimuthAngle = Math.min(
           this.baseAzimuthAngle + this.maxAzimuthAngle,
-          newAzimuthAngle
+          newAzimuthAngle,
         );
       }
 
       newAzimuthAngle = Math.min(
         this.baseAzimuthAngle + this.autoRotationMinMaxAzimuthAngle,
-        newAzimuthAngle
+        newAzimuthAngle,
       );
 
       // Clamp polar angle
       newPolarAngle = Math.max(
         this.basePolarAngle - this.minPolarAngle,
         0,
-        newPolarAngle
+        newPolarAngle,
       );
       newPolarAngle = Math.min(
         this.basePolarAngle + this.maxPolarAngle,
         Math.PI,
-        newPolarAngle
+        newPolarAngle,
       );
 
       newPolarAngle = Math.max(
         this.basePolarAngle - this.autoRotationMinMaxPolarAngle,
         0,
-        newPolarAngle
+        newPolarAngle,
       );
       newPolarAngle = Math.min(
         this.basePolarAngle + this.autoRotationMinMaxPolarAngle,
         Math.PI,
-        newPolarAngle
+        newPolarAngle,
       );
 
       // // If the actual change is significantly different from expected, it was clamped
@@ -1415,7 +1417,7 @@ export class CameraControlsScript extends PcScript {
 
     const shortestPathTarget = this.getShortestPathAzimuthAngle(
       this.real.azimuthAngle,
-      this.target.azimuthAngle
+      this.target.azimuthAngle,
     );
     this.real.azimuthAngle +=
       (shortestPathTarget - this.real.azimuthAngle) * this.lerpFactor;
@@ -1425,7 +1427,7 @@ export class CameraControlsScript extends PcScript {
     this.real.lookat.lerp(
       this.real.lookat,
       this.target.lookat,
-      this.lerpFactor
+      this.lerpFactor,
     );
 
     // Update camera position based on new angles

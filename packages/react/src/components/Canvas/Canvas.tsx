@@ -3,13 +3,11 @@ import { CustomEase } from "gsap/CustomEase";
 import * as pc from "playcanvas";
 import React, { useEffect, useRef, useState } from "react";
 import { useCanvasContext } from "../../context/CanvasContext";
-import { HitPointsScript } from "../../scripts/hitpoints";
-import { hexToRgbaFloat, lerp, mapMetadataToRecord } from "../../utils/helper";
 import {
   CameraControlsScript,
   getCameraInstance,
 } from "../../scripts/camera-controls";
-import { requestRender } from "../../utils/requestRender";
+import { HitPointsScript } from "../../scripts/hitpoints";
 import {
   applyGsplatAntiAlias,
   configureGsplatRenderer,
@@ -17,11 +15,13 @@ import {
   HdrLinearCameraPath,
   runPlayCanvasLifecycle,
 } from "../../utils/gsplatRenderer";
+import { hexToRgbaFloat, lerp, mapMetadataToRecord } from "../../utils/helper";
+import { requestRender } from "../../utils/requestRender";
 import ErrorHandler from "../ErrorHandler/ErrorHandler";
 import HitPoints, { HitPoint } from "../HitPoints/HitPoints";
 import UI, { UIChild } from "../UI/UI";
-import styles from "./Canvas.module.css";
 import viewerStyles from "../Viewer.module.css";
+import styles from "./Canvas.module.css";
 
 type Props = {
   className?: string;
@@ -543,7 +543,6 @@ const Canvas: React.FC<Props> = ({ className, uiChild, hitPoint }) => {
 
             // Add model component
             newEntity.addComponent("gsplat", {
-              type: "asset",
               asset: loadedAsset,
               unified: false,
             });
